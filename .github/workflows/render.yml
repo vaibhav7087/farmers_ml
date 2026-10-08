@@ -1,0 +1,59 @@
+name: CI/CD - Render Service
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'render-service/**'
+      - 'package.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'render-service/**'
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./render-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: render-service/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build
+
+  deploy-preview:
+    needs: test-and-build
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Render (Preview)
+        uses: render/deploy-action@v1
+        with:
+          serviceId: ${{ secrets.RENDER_SERVICE_ID_PREVIEW }}
+          apiKey: ${{ secrets.RENDER_API_KEY }}
+          workingDirectory: ./render-service
+
+  deploy-production:
+    needs: test-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Render (Production)
+        uses: render/deploy-action@v1
+        with:
+          serviceId: ${{ secrets.RENDER_SERVICE_ID }}
+          apiKey: ${{ secrets.RENDER_API_KEY }}
+          workingDirectory: ./render-service

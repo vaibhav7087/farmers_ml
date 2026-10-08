@@ -1,0 +1,92 @@
+name: CI/CD - Flutter App
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/**'
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'
+          channel: 'stable'
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter build apk --release --split-per-abi
+      - run: flutter build web --release
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kisaan-ml-apk
+          path: |
+            build/app/outputs/flutter-apk/app-*.apk
+          retention-days: 30
+
+      - name: Upload Web artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kisaan-ml-web
+          path: build/web/**
+          retention-days: 30
+
+  deploy-web:
+    needs: test-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: kisaan-ml-web
+          path: ./web
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: kisaan-ml
+          directory: ./web
+          branch: main
+
+  create-release:
+    needs: test-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: kisaan-ml-apk
+          path: ./apk
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Kisaan-ML v${{ github.run_number }}
+          body: |
+            Automated build #${{ github.run_number }}
+            
+            **APK Downloads:**
+            - arm64-v8a: \`app-arm64-v8a-release.apk\`
+            - armeabi-v7a: \`app-armeabi-v7a-release.apk\`
+            
+            **Web App:** https://kisaan-ml.pages.dev
+          files: |
+            ./apk/*.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

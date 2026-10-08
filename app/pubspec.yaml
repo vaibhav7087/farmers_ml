@@ -1,0 +1,48 @@
+name: kisaan_ml
+description: Kisaan-ML - AI-powered crop advisory for Indian farmers
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  http: ^1.2.1
+  provider: ^6.1.2
+  shared_preferences: ^2.2.2
+  geolocator: ^11.0.0
+  permission_handler: ^11.3.0
+  fl_chart: ^0.68.0
+  intl: ^0.19.0
+  url_launcher: ^6.2.5
+  connectivity_plus: ^5.0.2
+  package_info_plus: ^5.0.1
+  flutter_local_notifications: ^17.2.1
+  workmanager: ^0.5.2
+  sqflite: ^2.3.3
+  path: ^1.9.0
+  crypto: ^3.0.3
+  json_annotation: ^4.9.0
+  freezed_annotation: ^2.4.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.10
+  json_serializable: ^6.8.0
+  freezed: ^2.5.2
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+  fonts:
+    - family: NotoSansDevanagari
+      fonts:
+        - asset: fonts/NotoSansDevanagari-Regular.ttf
+        - asset: fonts/NotoSansDevanagari-Bold.ttf
+          weight: 700

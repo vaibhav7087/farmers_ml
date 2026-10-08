@@ -1,0 +1,103 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for D1 simulation and persistent data
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kisaan_ml
+      POSTGRES_USER: kisaan
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kisaan123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kisaan -d kisaan_ml"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for BullMQ queues and caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # MinIO for R2-compatible object storage
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # Create MinIO bucket on startup
+  minio-setup:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-minioadmin} ${MINIO_ROOT_PASSWORD:-minioadmin123};
+      mc mb myminio/kisaan-ml-models --ignore-existing;
+      mc mb myminio/kisaan-ml-data --ignore-existing;
+      mc anonymous set public myminio/kisaan-ml-data;
+      echo 'MinIO buckets created';
+      "
+
+  # LocalStack for D1 simulation (SQLite)
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      SERVICES: dynamodb,s3
+      DEBUG: 1
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+    ports:
+      - "4566:4566"
+    volumes:
+      - localstack_data:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Cloudflare Workers local dev (via wrangler)
+  # Run separately: cd workers && npm run dev
+
+  # Render service local dev
+  # Run separately: cd render-service && npm run dev
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  localstack_data:
+
+networks:
+  default:
+    name: kisaan-ml-network
