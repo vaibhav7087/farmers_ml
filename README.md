@@ -2,15 +2,27 @@
 
 > **Real data. Real models. Real impact.**
 
-Kisaan-ML is an end-to-end ML system for rural Indian farmers providing:
-- 🌾 **Yield Forecasting** — Satellite + Weather + Soil fusion (LightGBM)
-- 💰 **Price Forecasting** — Policy-aware mandi price prediction (Holt-Winters + LightGBM)
-- 🚨 **Outbreak Alerts** — Pest/disease anomaly detection (IsolationForest)
-- 📱 **Farmer App** — Flutter app with offline-first design (Hindi/Marathi/English)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Flutter 3.22+](https://img.shields.io/badge/flutter-3.22+-blue.svg)](https://flutter.dev/)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-orange.svg)](https://workers.cloudflare.com/)
+
+Kisaan-ML is an end-to-end ML system for rural Indian farmers providing real-time, actionable agricultural intelligence. Built for **Nexathon II (Healing with Data)** — deploying production-grade ML on real public data with zero synthetic fallbacks.
 
 ---
 
-## Architecture
+## 🎯 What It Does
+
+| Module | Description | Tech Stack |
+|--------|-------------|------------|
+| **🌾 Yield Forecasting** | Predicts kg/ha at harvest using satellite + weather + soil fusion | LightGBM → ONNX |
+| **💰 Price Forecasting** | 14-day mandi price prediction with policy-event awareness | Holt-Winters + LightGBM |
+| **🚨 Outbreak Alerts** | Pest/disease anomaly detection at district level | IsolationForest |
+| **📱 Farmer App** | Offline-first Flutter app (Hindi/Marathi/English) | Flutter + Provider |
+
+---
+
+## 🏗 Architecture
 
 ```
 ┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
@@ -33,45 +45,59 @@ Kisaan-ML is an end-to-end ML system for rural Indian farmers providing:
 
 ---
 
-## Quick Start
+## 📊 Live Demo
+
+| Service | URL |
+|---------|-----|
+| **API (Cloudflare Workers)** | `https://kisaan-ml-api.bylancetechnologies.workers.dev` |
+| **Health Check** | `https://kisaan-ml-api.bylancetechnologies.workers.dev/health` |
+| **Yield Prediction** | `GET /api/v1/predict/yield?district=yavatmal&crop=cotton` |
+| **Price Prediction** | `GET /api/v1/predict/price?mandi=yavatmal%20mandi&crop=cotton` |
+| **Combined Advisory** | `POST /api/v1/advisory` |
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.11+
 - Node.js 20+ (for Cloudflare Workers)
-- Flutter 3.22+ (for app)
+- Flutter 3.22+ (for mobile app)
 - Cloudflare account (Workers + R2 + KV + D1)
 - Render account (Web Service + Redis)
 - GitHub account (CI/CD)
 
-### 1. Clone and Setup
+### 1. Clone & Setup
 ```bash
-git clone https://github.com/yourusername/kisaan-ml
-cd kisaan-ml
+git clone https://github.com/vaibhav7087/farmers_ml.git
+cd farmers_ml
 
-# Install Python deps
+# Python dependencies
 pip install -r requirements.txt
 
-# Install worker deps
+# Cloudflare Workers
 cd workers && npm install && cd ..
 
-# Install render deps
+# Render Service
 cd render-service && npm install && cd ..
 
-# Install Flutter deps
+# Flutter App
 cd app && flutter pub get && cd ..
 ```
 
 ### 2. Configure Environment
 ```bash
-# Copy example env files
+# Workers
 cp workers/.env.example workers/.env
-cp render-service/.env.example render-service/.env
-cp app/.env.example app/.env
+# Add: CF_API_TOKEN, CF_ACCOUNT_ID
 
-# Edit with your credentials:
-# - Cloudflare: API_TOKEN, ACCOUNT_ID, R2_BUCKET, KV_NAMESPACE, D1_DATABASE
-# - Render: REDIS_URL, SERVICE_URL
-# - App: API_BASE_URL, SUPABASE_URL/KEY (if using)
+# Render Service
+cp render-service/.env.example render-service/.env
+# Add: REDIS_URL, DATABASE_URL, CF_R2 credentials
+
+# Flutter App
+cp app/.env.example app/.env
+# Add: API_BASE_URL, SUPABASE credentials
 ```
 
 ### 3. Download Training Data (FAIL-CLOSED)
@@ -85,28 +111,28 @@ python data/fetch_shc.py --state Maharashtra
 
 ### 4. Train Models
 ```bash
-# Train yield model (LightGBM)
+# Yield model (LightGBM → ONNX)
 python ml/train_yield.py
 
-# Train price models (Holt-Winters + LightGBM)
+# Price models (Holt-Winters + LightGBM)
 python ml/train_price.py
 ```
 
 ### 5. Deploy
 ```bash
-# Deploy Cloudflare Workers
-cd workers && npm run deploy && cd ..
+# Cloudflare Workers
+cd workers && npm run deploy
 
-# Deploy Render Service
-cd render-service && npm run deploy && cd ..
+# Render Service
+cd render-service && npm run deploy
 
-# Build Flutter App
-cd app && flutter build apk --release --split-per-abi && cd ..
+# Flutter App
+cd app && flutter build apk --release --split-per-abi && flutter build web --release
 ```
 
 ---
 
-## Data Sources (All Public, No Auth Required)
+## 📦 Data Sources (All Public, No Auth Required)
 
 | Pipeline | Source | Frequency | License |
 |----------|--------|-----------|---------|
@@ -120,13 +146,13 @@ cd app && flutter build apk --release --split-per-abi && cd ..
 
 ---
 
-## ML Models
+## 🤖 ML Models
 
-### Yield Forecasting (LightGBM)
+### Yield Forecasting (LightGBM → ONNX)
 - **Features**: NDVI/EVI/SAVI trends, temperature, rainfall, humidity, soil NPK/pH/OC, sowing week, elevation
 - **Target**: kg/ha at harvest
 - **Validation**: 5-fold CV, RMSE ~300 kg/ha, R² > 0.75
-- **Export**: ONNX for Cloudflare Workers
+- **Export**: ONNX for Cloudflare Workers edge inference
 
 ### Price Forecasting (Holt-Winters + LightGBM)
 - **Models per mandi-commodity-variety**
@@ -143,35 +169,7 @@ cd app && flutter build apk --release --split-per-abi && cd ..
 
 ---
 
-## API Endpoints (Cloudflare Workers)
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/health` | GET | Health check (KV, D1, R2) |
-| `/api/v1/predict/yield` | GET | Yield forecast (district, crop, season, sowing_week) |
-| `/api/v1/predict/price` | GET | Price forecast (mandi, crop, variety, horizon) |
-| `/api/v1/advisory` | POST | Combined advisory (yield + price + economics) |
-| `/api/v1/districts` | GET | List all districts with soil data |
-| `/api/v1/mandis` | GET | List mandis (filter by state) |
-| `/api/v1/crops` | GET | List supported crops |
-
----
-
-## Render Service (Persistent Connections)
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/health` | GET | Health + queue stats |
-| `/ws/:channel` | WS | Real-time updates (training, satellite, inference) |
-| `/api/v1/train/yield` | POST | Queue yield training job |
-| `/api/v1/train/price` | POST | Queue price training job |
-| `/api/v1/inference/batch` | POST | Batch inference |
-| `/api/v1/satellite/fetch` | POST | Queue Sentinel-2 fetch |
-| `/api/v1/retrain/all` | POST | Full retrain all crops |
-
----
-
-## Flutter App
+## 📱 Flutter App
 
 ### Features
 - **Offline-first**: Cached advisory, sync when online
@@ -182,7 +180,7 @@ cd app && flutter build apk --release --split-per-abi && cd ..
 - **Alerts**: Price, weather, outbreak notifications
 - **Profile**: Crops, districts, mandis, language preference
 
-### Build
+### Build & Download
 ```bash
 cd app
 flutter pub get
@@ -190,38 +188,38 @@ flutter build apk --release --split-per-abi  # arm64-v8a, armeabi-v7a
 flutter build web --release                   # For Cloudflare Pages
 ```
 
-### Download
-- **APK**: GitHub Releases (auto-published on push to main)
-- **Web**: https://kisaan-ml.pages.dev (Cloudflare Pages)
+**Downloads:**
+- **APK**: GitHub Releases (auto-published on push)
+- **Web App**: Cloudflare Pages (auto-deployed)
 
 ---
 
-## CI/CD (GitHub Actions)
+## 🔧 CI/CD (GitHub Actions)
 
 | Workflow | Trigger | Actions |
 |----------|---------|---------|
-| `workers.yml` | Push to main (workers/) | Typecheck → Test → Deploy to CF Workers (preview/prod) |
+| `workers.yml` | Push to main (workers/) | Typecheck → Test → Deploy to CF Workers |
 | `render.yml` | Push to main (render-service/) | Test → Build → Deploy to Render |
 | `flutter.yml` | Push to main (app/) | Analyze → Test → Build APK + Web → Upload to GH Release + Deploy to CF Pages |
 
 ---
 
-## Secrets Required (GitHub Repository Settings)
+## 🔐 Required GitHub Secrets
 
-| Secret | Used In | Description |
-|--------|---------|-------------|
-| `CF_API_TOKEN` | workers.yml, flutter.yml | Cloudflare API token (Workers + Pages) |
-| `CF_ACCOUNT_ID` | workers.yml, flutter.yml | Cloudflare Account ID |
-| `RENDER_API_KEY` | render.yml | Render API key |
-| `RENDER_SERVICE_ID` | render.yml | Render Web Service ID (production) |
-| `RENDER_SERVICE_ID_PREVIEW` | render.yml | Render Web Service ID (preview) |
+| Secret | Description |
+|--------|-------------|
+| `CF_API_TOKEN` | Cloudflare API token (Workers + Pages permissions) |
+| `CF_ACCOUNT_ID` | Cloudflare Account ID |
+| `RENDER_API_KEY` | Render API key |
+| `RENDER_SERVICE_ID` | Render Web Service ID (production) |
+| `RENDER_SERVICE_ID_PREVIEW` | Render Web Service ID (preview) |
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```
-kisaan-ml/
+farmers_ml/
 ├── workers/                 # Cloudflare Workers (serverless inference)
 │   ├── src/
 │   │   ├── index.ts         # Hono app + routes
@@ -232,11 +230,11 @@ kisaan-ml/
 │
 ├── render-service/          # Render Web Service (persistent)
 │   ├── src/
-│   │   ├── index.ts         # Fastify + WebSocket + BullMQ
+│   │   ├── index.ts         # Fastify + BullMQ + WebSocket
 │   │   ├── routes.ts        # REST API
 │   │   └── workers/         # training, inference, satellite
-│   ├── package.json
-│   └── render.yaml          # Render config
+│   ├── render.yaml          # Render config
+│   └── package.json
 │
 ├── ml/                      # ML Training Scripts
 │   ├── train_yield.py       # LightGBM yield model
@@ -264,6 +262,8 @@ kisaan-ml/
 │   ├── pubspec.yaml
 │   └── render.yaml          # Cloudflare Pages config
 │
+├── data/                    # Data Pipelines (FAIL-CLOSED)
+├── ml/                      # ML Training Scripts
 ├── scripts/                 # Utility scripts
 ├── .github/workflows/       # CI/CD
 ├── docker-compose.yml       # Local dev stack
@@ -273,10 +273,10 @@ kisaan-ml/
 
 ---
 
-## Local Development Stack
+## 🐳 Local Development Stack
 
 ```bash
-# Start local stack (PostgreSQL, Redis, MinIO for R2, Localstack for D1)
+# Start local stack (PostgreSQL, Redis, MinIO for R2)
 docker-compose up -d
 
 # Run workers locally
@@ -291,26 +291,18 @@ cd app && flutter run
 
 ---
 
-## License
+## 📜 License
 
 MIT License - Code only. Data terms per respective sources:
 - IMD/SHC/AgMarkNet: Government of India (open)
 - Sentinel-2: ESA/Copernicus (open)
 - PIB: Government of India (open)
 
----
-
-## Contributing
-
-1. Fork the repo
-2. Create feature branch
-3. Add tests for new features
-4. Ensure all pipelines pass FAIL-CLOSED checks
-5. Submit PR
+Data terms are governed by their respective sources. This license applies only to the code in this repository, not to the data fetched or used by it.
 
 ---
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 - **Planetary Computer** for Sentinel-2 STAC API
 - **IMD Pune** for gridded weather data
@@ -321,4 +313,12 @@ MIT License - Code only. Data terms per respective sources:
 
 ---
 
-**Built for Nexathon II — Healing with Data** 🏆
+## 🏆 Built for Nexathon II — Healing with Data
+
+**Team:** Kisaan-ML  
+**Track:** Healing with Data / Paper Presentation  
+**Venue:** AIKTC, New Panvel | 9th October 2024
+
+---
+
+*Real data. Real models. Real impact.* 🌾
