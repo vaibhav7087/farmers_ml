@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
-import '../../features/profile/providers/profile_provider.dart';
+import '../../../core/theme.dart';
+import '../../profile/providers/profile_provider.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});
@@ -164,3 +164,4 @@ class AlertItem {
 
   AlertItem(this.title, this.subtitle, this.value, this.icon, this.color, this.time);
 }
+

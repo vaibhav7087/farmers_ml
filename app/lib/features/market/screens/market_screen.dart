@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
-import '../../features/profile/providers/profile_provider.dart';
+import '../../../core/theme.dart';
+import '../../profile/providers/profile_provider.dart';
 
 class MarketScreen extends StatefulWidget {
   const MarketScreen({super.key});
@@ -305,3 +305,4 @@ class MandiPrice {
 
   MandiPrice(this.crop, this.mandi, this.variety, this.currentPrice, this.previousPrice, this.change, this.icon, this.color);
 }
+

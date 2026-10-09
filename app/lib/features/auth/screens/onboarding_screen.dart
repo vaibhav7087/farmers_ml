@@ -1,6 +1,7 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
+import '../../../core/theme.dart';
 import '../providers/auth_provider.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -176,3 +177,4 @@ class OnboardingPage {
     required this.color,
   });
 }
+

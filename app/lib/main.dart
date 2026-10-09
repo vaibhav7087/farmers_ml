@@ -23,7 +23,8 @@ class KisaanMLApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider()..load()),
       ],
       child: MaterialApp.router(
-        title: 'Kisaan-ML',
+        title: 'Kisaan-ML Demo',
+        builder: (context, child) => Banner(message: 'DEMO', location: BannerLocation.topEnd, child: child!),
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
@@ -39,3 +40,5 @@ class KisaanMLApp extends StatelessWidget {
     );
   }
 }
+
+

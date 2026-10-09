@@ -40,3 +40,10 @@ npm test
 
 To run locally, set REDIS_URL to a local Redis URL, then npm start.
 
+
+## Farmer app website
+
+The Blueprint also publishes the Flutter app as a free static website. It uses Flutter 3.27.4 and the backend API at https://kisaan-ml-render.onrender.com/api/v1.
+Local Flutter SDK: D:\farmers_ml\.tools\flutter\bin\flutter.bat
+Build locally from app: ..\.tools\flutter\bin\flutter.bat build web --release
+The mobile app's existing demo login and sample chart/market values remain demonstration features. Real advisory is unavailable until models and training data are integrated.

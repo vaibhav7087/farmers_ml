@@ -1,7 +1,8 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
-import '../../core/router.dart';
+import '../../../core/theme.dart';
+import '../../../core/router.dart';
 import '../providers/profile_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -71,11 +72,11 @@ class ProfileScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildStatChip('फसलें', user.crops.length.toString()),
+                _buildStatChip(context, 'फसलें', user.crops.length.toString()),
                 const SizedBox(width: 12),
-                _buildStatChip('देखी जा रही', '3'),
+                _buildStatChip(context, 'देखी जा रही', '3'),
                 const SizedBox(width: 12),
-                _buildStatChip('अलर्ट', '5'),
+                _buildStatChip(context, 'अलर्ट', '5'),
               ],
             ),
           ],
@@ -84,7 +85,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatChip(String label, String value) {
+  Widget _buildStatChip(BuildContext context, String label, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(color: AppTheme.primaryGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
@@ -106,11 +107,11 @@ class ProfileScreen extends StatelessWidget {
           children: [
             Text('व्यक्तिगत जानकारी', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
-            _buildInfoRow(Icons.person, 'नाम', user.name),
-            _buildInfoRow(Icons.phone, 'फोन', user.phone.isNotEmpty ? user.phone : 'नहीं जोड़ा गया'),
-            _buildInfoRow(Icons.location_on, 'जिला', user.district),
-            _buildInfoRow(Icons.location_city, 'राज्य', user.state),
-            _buildInfoRow(Icons.language, 'भाषा', _getLanguageName(user.language)),
+            _buildInfoRow(context, Icons.person, 'नाम', user.name),
+            _buildInfoRow(context, Icons.phone, 'फोन', user.phone.isNotEmpty ? user.phone : 'नहीं जोड़ा गया'),
+            _buildInfoRow(context, Icons.location_on, 'जिला', user.district),
+            _buildInfoRow(context, Icons.location_city, 'राज्य', user.state),
+            _buildInfoRow(context, Icons.language, 'भाषा', _getLanguageName(user.language)),
           ],
         ),
       ),
@@ -125,7 +126,7 @@ class ProfileScreen extends StatelessWidget {
     }
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(BuildContext context, IconData icon, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -244,3 +245,4 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+

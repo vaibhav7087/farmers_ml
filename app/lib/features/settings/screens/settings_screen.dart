@@ -1,7 +1,8 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
-import '../../features/profile/providers/profile_provider.dart';
+import '../../../core/theme.dart';
+import '../../profile/providers/profile_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -15,31 +16,31 @@ class SettingsScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _buildSection('भाषा और क्षेत्र', [
-                _buildLanguageTile(profile),
-                _buildRegionTile(profile),
+              _buildSection(context, 'भाषा और क्षेत्र', [
+                _buildLanguageTile(context, profile),
+                _buildRegionTile(context, profile),
               ]),
               const SizedBox(height: 24),
-              _buildSection('सूचनाएं', [
-                _buildNotificationTile(profile),
-                _buildAlertPreferencesTile(),
+              _buildSection(context, 'सूचनाएं', [
+                _buildNotificationTile(context, profile),
+                _buildAlertPreferencesTile(context),
               ]),
               const SizedBox(height: 24),
-              _buildSection('दिखावट', [
-                _buildThemeTile(profile),
+              _buildSection(context, 'दिखावट', [
+                _buildThemeTile(context, profile),
               ]),
               const SizedBox(height: 24),
-              _buildSection('डेटा और गोपनीयता', [
-                _buildDataUsageTile(),
-                _buildCacheTile(),
-                _buildExportTile(),
-                _buildDeleteTile(),
+              _buildSection(context, 'डेटा और गोपनीयता', [
+                _buildDataUsageTile(context),
+                _buildCacheTile(context),
+                _buildExportTile(context),
+                _buildDeleteTile(context),
               ]),
               const SizedBox(height: 24),
-              _buildSection('ऐप के बारे में', [
-                _buildVersionTile(),
-                _buildLicenseTile(),
-                _buildSupportTile(),
+              _buildSection(context, 'ऐप के बारे में', [
+                _buildVersionTile(context),
+                _buildLicenseTile(context),
+                _buildSupportTile(context),
               ]),
               const SizedBox(height: 32),
               _buildLogoutButton(context),
@@ -50,7 +51,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(String title, List<Widget> children) {
+  Widget _buildSection(BuildContext context, String title, List<Widget> children) {
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +66,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLanguageTile(ProfileProvider profile) {
+  Widget _buildLanguageTile(BuildContext context, ProfileProvider profile) {
     return ListTile(
       leading: const Icon(Icons.language),
       title: const Text('भाषा'),
@@ -101,7 +102,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRegionTile(ProfileProvider profile) {
+  Widget _buildRegionTile(BuildContext context, ProfileProvider profile) {
     return ListTile(
       leading: const Icon(Icons.location_on),
       title: const Text('क्षेत्र/राज्य'),
@@ -111,9 +112,9 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationTile(ProfileProvider profile) {
+  Widget _buildNotificationTile(BuildContext context, ProfileProvider profile) {
     return SwitchListTile(
-      leading: const Icon(Icons.notifications),
+      secondary: const Icon(Icons.notifications),
       title: const Text('पुश सूचनाएं'),
       subtitle: const Text('भाव अलर्ट, मौसम चेतावनी, प्रकोप सूचनाएं'),
       value: profile.notificationsEnabled,
@@ -122,7 +123,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAlertPreferencesTile() {
+  Widget _buildAlertPreferencesTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.tune),
       title: const Text('अलर्ट प्राथमिकताएं'),
@@ -152,9 +153,9 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildThemeTile(ProfileProvider profile) {
+  Widget _buildThemeTile(BuildContext context, ProfileProvider profile) {
     return SwitchListTile(
-      leading: const Icon(Icons.dark_mode),
+      secondary: const Icon(Icons.dark_mode),
       title: const Text('डार्क मोड'),
       subtitle: const Text('रात में आंखों के लिए आरामदायक'),
       value: profile.darkMode,
@@ -163,7 +164,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDataUsageTile() {
+  Widget _buildDataUsageTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.storage),
       title: const Text('डेटा उपयोग'),
@@ -200,7 +201,7 @@ class SettingsScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('कैश साफ किया जा रहा है...')));
   }
 
-  Widget _buildCacheTile() {
+  Widget _buildCacheTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.cleaning_services),
       title: const Text('कैश साफ करें'),
@@ -210,7 +211,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildExportTile() {
+  Widget _buildExportTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.download),
       title: const Text('डेटा निर्यात करें'),
@@ -224,7 +225,7 @@ class SettingsScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('निर्यात तैयार हो रहा है...')));
   }
 
-  Widget _buildDeleteTile() {
+  Widget _buildDeleteTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.delete_forever, color: Colors.red),
       title: const Text('खाता हटाएं', style: TextStyle(color: Colors.red)),
@@ -251,7 +252,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVersionTile() {
+  Widget _buildVersionTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.info_outline),
       title: const Text('ऐप संस्करण'),
@@ -260,7 +261,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLicenseTile() {
+  Widget _buildLicenseTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.description),
       title: const Text('ओपन सोर्स लाइसेंस'),
@@ -274,7 +275,7 @@ class SettingsScreen extends StatelessWidget {
     showLicensePage(context: context, applicationName: 'Kisaan-ML', applicationVersion: '1.0.0+1');
   }
 
-  Widget _buildSupportTile() {
+  Widget _buildSupportTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.help_outline),
       title: const Text('सहायता और प्रतिक्रिया'),
@@ -321,3 +322,4 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
+

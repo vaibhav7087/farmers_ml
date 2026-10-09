@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'features/auth/screens/login_screen.dart';
-import 'features/auth/screens/onboarding_screen.dart';
-import 'features/advisory/screens/advisory_screen.dart';
-import 'features/advisory/screens/yield_detail_screen.dart';
-import 'features/advisory/screens/price_detail_screen.dart';
-import 'features/alerts/screens/alerts_screen.dart';
-import 'features/market/screens/market_screen.dart';
-import 'features/profile/screens/profile_screen.dart';
-import 'features/settings/screens/settings_screen.dart';
-import 'core/providers/auth_provider.dart';
+import '../features/auth/screens/login_screen.dart';
+import '../features/auth/screens/onboarding_screen.dart';
+import '../features/advisory/screens/advisory_screen.dart';
+import '../features/advisory/screens/yield_detail_screen.dart';
+import '../features/advisory/screens/price_detail_screen.dart';
+import '../features/alerts/screens/alerts_screen.dart';
+import '../features/market/screens/market_screen.dart';
+import '../features/profile/screens/profile_screen.dart';
+import '../features/settings/screens/settings_screen.dart';
+import '../features/auth/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 final router = GoRouter(
   initialLocation: '/onboarding',
@@ -55,7 +56,7 @@ final router = GoRouter(
           builder: (context, state) => PriceDetailScreen(
             mandi: state.pathParameters['mandi']!,
             crop: state.pathParameters['crop']!,
-            variety: state.queryParameters['variety'],
+            variety: state.uri.queryParameters['variety'],
           ),
         ),
         GoRoute(
@@ -134,3 +135,4 @@ class _BottomNavBar extends StatelessWidget {
     );
   }
 }
+

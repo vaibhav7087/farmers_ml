@@ -25,3 +25,14 @@ services:
     maxmemoryPolicy: noeviction
     ipAllowList: []
 
+
+  - type: web
+    name: kisaan-ml-app
+    runtime: static
+    rootDir: app
+    buildCommand: bash build-render.sh
+    staticPublishPath: build/web
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../core/theme.dart';
-import '../../core/router.dart';
+import '../../../core/theme.dart';
+import '../../../core/router.dart';
 
 class YieldDetailScreen extends StatelessWidget {
   final String district;
@@ -20,22 +20,22 @@ class YieldDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSummaryCard(),
+            _buildSummaryCard(context),
             const SizedBox(height: 24),
-            _buildChartCard(),
+            _buildChartCard(context),
             const SizedBox(height: 24),
-            _buildFeatureImportance(),
+            _buildFeatureImportance(context),
             const SizedBox(height: 24),
-            _buildSatelliteCard(),
+            _buildSatelliteCard(context),
             const SizedBox(height: 24),
-            _buildRecommendations(),
+            _buildRecommendations(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -44,9 +44,9 @@ class YieldDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat('पूर्वानुमानित उपज', '2,150 kg/ha', Icons.grass, AppTheme.primaryGreen),
-                _buildStat('आत्मविश्वास', '78%', Icons.verified, AppTheme.accentOrange),
-                _buildStat('पिछले साल', '1,980 kg/ha', Icons.history, Colors.blue),
+                _buildStat(context, 'पूर्वानुमानित उपज', '2,150 kg/ha', Icons.grass, AppTheme.primaryGreen),
+                _buildStat(context, 'आत्मविश्वास', '78%', Icons.verified, AppTheme.accentOrange),
+                _buildStat(context, 'पिछले साल', '1,980 kg/ha', Icons.history, Colors.blue),
               ],
             ),
             const SizedBox(height: 16),
@@ -54,9 +54,9 @@ class YieldDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat('बुवाई सप्ताह', '26', Icons.calendar_today, Colors.purple),
-                _buildStat('मौसम', 'खरीफ', Icons.wb_sunny, Colors.orange),
-                _buildStat('सैटेलाइट', 'सक्रिय', Icons.satellite, Colors.teal),
+                _buildStat(context, 'बुवाई सप्ताह', '26', Icons.calendar_today, Colors.purple),
+                _buildStat(context, 'मौसम', 'खरीफ', Icons.wb_sunny, Colors.orange),
+                _buildStat(context, 'सैटेलाइट', 'सक्रिय', Icons.satellite, Colors.teal),
               ],
             ),
           ],
@@ -65,7 +65,7 @@ class YieldDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStat(String label, String value, IconData icon, Color color) {
+  Widget _buildStat(BuildContext context, String label, String value, IconData icon, Color color) {
     return Column(
       children: [
         Container(
@@ -80,7 +80,7 @@ class YieldDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildChartCard() {
+  Widget _buildChartCard(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -126,7 +126,7 @@ class YieldDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureImportance() {
+  Widget _buildFeatureImportance(BuildContext context) {
     final features = [
       {'name': 'NDVI (सैटेलाइट)', 'importance': 0.32},
       {'name': 'मिट्टी N-P-K', 'importance': 0.24},
@@ -160,7 +160,7 @@ class YieldDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('${(f['importance'] as double * 100).toInt()}%', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
+                  Text('${((f['importance'] as double) * 100).toInt()}%', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
                 ],
               ),
             )),
@@ -170,7 +170,7 @@ class YieldDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSatelliteCard() {
+  Widget _buildSatelliteCard(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -187,11 +187,11 @@ class YieldDetailScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _buildSatStat('NDVI', '0.68', 'अच्छा वनस्पति स्वास्थ्य')),
+                Expanded(child: _buildSatStat(context, 'NDVI', '0.68', 'अच्छा वनस्पति स्वास्थ्य')),
                 const VerticalDivider(),
-                Expanded(child: _buildSatStat('EVI', '0.54', 'उन्नत वनस्पति सूचकांक')),
+                Expanded(child: _buildSatStat(context, 'EVI', '0.54', 'उन्नत वनस्पति सूचकांक')),
                 const VerticalDivider(),
-                Expanded(child: _buildSatStat('बादल कवर', '12%', 'कम - विश्वसनीय डेटा')),
+                Expanded(child: _buildSatStat(context, 'बादल कवर', '12%', 'कम - विश्वसनीय डेटा')),
               ],
             ),
             const SizedBox(height: 16),
@@ -204,7 +204,7 @@ class YieldDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSatStat(String label, String value, String desc) {
+  Widget _buildSatStat(BuildContext context, String label, String value, String desc) {
     return Column(
       children: [
         Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.teal)),
@@ -214,7 +214,7 @@ class YieldDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecommendations() {
+  Widget _buildRecommendations(BuildContext context) {
     final recs = [
       'NDVI मजबूत है - उर्वरक टॉप-ड्रेसिंग समय पर करें',
       'वर्षा पूर्वानुमान सामान्य - सिंचाई योजना सामान्य रखें',
@@ -253,3 +253,4 @@ class YieldDetailScreen extends StatelessWidget {
     );
   }
 }
+

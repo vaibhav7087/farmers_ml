@@ -1,7 +1,8 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
-import '../../core/router.dart';
+import '../../../core/theme.dart';
+import '../../../core/router.dart';
 import '../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -156,3 +157,4 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 }
+

@@ -103,3 +103,4 @@ Desktop.ini
 !package-lock.json
 !tsconfig.json
 .tools/
+!app/pubspec.lock

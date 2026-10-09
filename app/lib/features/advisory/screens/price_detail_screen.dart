@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../core/theme.dart';
+import '../../../core/theme.dart';
 
 class PriceDetailScreen extends StatelessWidget {
   final String mandi;
@@ -20,22 +20,22 @@ class PriceDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSummaryCard(),
+            _buildSummaryCard(context),
             const SizedBox(height: 24),
-            _buildPriceChart(),
+            _buildPriceChart(context),
             const SizedBox(height: 24),
-            _buildPolicyCard(),
+            _buildPolicyCard(context),
             const SizedBox(height: 24),
-            _buildTradingSignals(),
+            _buildTradingSignals(context),
             const SizedBox(height: 24),
-            _buildActionPlan(),
+            _buildActionPlan(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -44,9 +44,9 @@ class PriceDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat('वर्तमान भाव', '₹5,850/क्विंटल', Icons.currency_rupee, AppTheme.primaryGreen),
-                _buildStat('14-दिन पूर्वानुमान', '₹6,120/क्विंटल', Icons.trending_up, AppTheme.accentOrange),
-                _buildStat('आत्मविश्वास', '72%', Icons.verified, Colors.blue),
+                _buildStat(context, 'वर्तमान भाव', '₹5,850/क्विंटल', Icons.currency_rupee, AppTheme.primaryGreen),
+                _buildStat(context, '14-दिन पूर्वानुमान', '₹6,120/क्विंटल', Icons.trending_up, AppTheme.accentOrange),
+                _buildStat(context, 'आत्मविश्वास', '72%', Icons.verified, Colors.blue),
               ],
             ),
             const SizedBox(height: 16),
@@ -54,9 +54,9 @@ class PriceDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat('साप्ताहिक परिवर्तन', '+4.6%', Icons.percent, Colors.green),
-                _buildStat('मासिक परिवर्तन', '+8.2%', Icons.show_chart, Colors.green),
-                _buildStat('नीति प्रभाव', '+₹270', Icons.gavel, AppTheme.accentOrange),
+                _buildStat(context, 'साप्ताहिक परिवर्तन', '+4.6%', Icons.percent, Colors.green),
+                _buildStat(context, 'मासिक परिवर्तन', '+8.2%', Icons.show_chart, Colors.green),
+                _buildStat(context, 'नीति प्रभाव', '+₹270', Icons.gavel, AppTheme.accentOrange),
               ],
             ),
           ],
@@ -65,7 +65,7 @@ class PriceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStat(String label, String value, IconData icon, Color color) {
+  Widget _buildStat(BuildContext context, String label, String value, IconData icon, Color color) {
     return Column(
       children: [
         Container(
@@ -80,7 +80,7 @@ class PriceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPriceChart() {
+  Widget _buildPriceChart(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -142,9 +142,9 @@ class PriceDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildLegend(AppTheme.accentOrange, 'नीति-समायोजित पूर्वानुमान'),
+                _buildLegend(context, AppTheme.accentOrange, 'नीति-समायोजित पूर्वानुमान'),
                 const SizedBox(width: 24),
-                _buildLegend(Colors.grey[400]!, 'बेसलाइन (कोई नीति नहीं)'),
+                _buildLegend(context, Colors.grey[400]!, 'बेसलाइन (कोई नीति नहीं)'),
               ],
             ),
           ],
@@ -153,7 +153,7 @@ class PriceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLegend(Color color, String label) {
+  Widget _buildLegend(BuildContext context, Color color, String label) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -164,7 +164,7 @@ class PriceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPolicyCard() {
+  Widget _buildPolicyCard(BuildContext context) {
     return Card(
       color: AppTheme.accentOrange.withValues(alpha: 0.05),
       child: Padding(
@@ -180,16 +180,16 @@ class PriceDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            _buildPolicyItem('MSP वृद्धि घोषणा', '+₹270/क्विंटल', 'केंद्र सरकार ने कपास MSP ₹7,200 से ₹7,470 किया', '2 दिन पहले'),
-            _buildPolicyItem('निर्यात प्रतिबंध हटाया', '+₹150/क्विंटल', 'कपास निर्यात पर प्रतिबंध हटाया गया', '1 सप्ताह पहले'),
-            _buildPolicyItem('खरीद लक्ष्य बढ़ाया', '+₹120/क्विंटल', 'CCI खरीद लक्ष्य 25% बढ़ाया', '3 दिन पहले'),
+            _buildPolicyItem(context, 'MSP वृद्धि घोषणा', '+₹270/क्विंटल', 'केंद्र सरकार ने कपास MSP ₹7,200 से ₹7,470 किया', '2 दिन पहले'),
+            _buildPolicyItem(context, 'निर्यात प्रतिबंध हटाया', '+₹150/क्विंटल', 'कपास निर्यात पर प्रतिबंध हटाया गया', '1 सप्ताह पहले'),
+            _buildPolicyItem(context, 'खरीद लक्ष्य बढ़ाया', '+₹120/क्विंटल', 'CCI खरीद लक्ष्य 25% बढ़ाया', '3 दिन पहले'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPolicyItem(String title, String impact, String desc, String time) {
+  Widget _buildPolicyItem(BuildContext context, String title, String impact, String desc, String time) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -223,7 +223,7 @@ class PriceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTradingSignals() {
+  Widget _buildTradingSignals(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -232,16 +232,16 @@ class PriceDetailScreen extends StatelessWidget {
           children: [
             Text('ट्रेडिंग सिग्नल', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
-            _buildSignal('खरीदें / होल्ड करें', 'भाव ऊपर की ओर - 14 दिन में +4.6% अपेक्षित', Icons.trending_up, Colors.green),
-            _buildSignal('बेचने में जल्दी न करें', 'नीति समर्थन मजबूत - MSP + निर्यात खुला', Icons.shield, Colors.blue),
-            _buildSignal('दूसरे सप्ताह नजर रखें', 'सप्ताह 2 में मामूली सुधार संभव', Icons.visibility, AppTheme.accentOrange),
+            _buildSignal(context, 'खरीदें / होल्ड करें', 'भाव ऊपर की ओर - 14 दिन में +4.6% अपेक्षित', Icons.trending_up, Colors.green),
+            _buildSignal(context, 'बेचने में जल्दी न करें', 'नीति समर्थन मजबूत - MSP + निर्यात खुला', Icons.shield, Colors.blue),
+            _buildSignal(context, 'दूसरे सप्ताह नजर रखें', 'सप्ताह 2 में मामूली सुधार संभव', Icons.visibility, AppTheme.accentOrange),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSignal(String title, String desc, IconData icon, Color color) {
+  Widget _buildSignal(BuildContext context, String title, String desc, IconData icon, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -266,7 +266,7 @@ class PriceDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionPlan() {
+  Widget _buildActionPlan(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -281,16 +281,16 @@ class PriceDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            _buildActionWeek('सप्ताह 1 (आज-7 दिन)', 'होल्ड करें - भाव चढ़ रहा है', 'बिक्री न करें', Colors.green),
-            _buildActionWeek('सप्ताह 2 (8-14 दिन)', 'बाजार नजर रखें - मामूली सुधार संभव', 'आंशिक बिक्री पर विचार', AppTheme.accentOrange),
-            _buildActionWeek('सप्ताह 3-4', 'नीति अपडेट जांचें - MCI खरीद शुरू', 'तैयार रहें', Colors.blue),
+            _buildActionWeek(context, 'सप्ताह 1 (आज-7 दिन)', 'होल्ड करें - भाव चढ़ रहा है', 'बिक्री न करें', Colors.green),
+            _buildActionWeek(context, 'सप्ताह 2 (8-14 दिन)', 'बाजार नजर रखें - मामूली सुधार संभव', 'आंशिक बिक्री पर विचार', AppTheme.accentOrange),
+            _buildActionWeek(context, 'सप्ताह 3-4', 'नीति अपडेट जांचें - MCI खरीद शुरू', 'तैयार रहें', Colors.blue),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildActionWeek(String week, String action, String detail, Color color) {
+  Widget _buildActionWeek(BuildContext context, String week, String action, String detail, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
@@ -316,3 +316,4 @@ class PriceDetailScreen extends StatelessWidget {
     );
   }
 }
+

@@ -84,3 +84,4 @@ class ProfileProvider extends ChangeNotifier {
     await prefs.setStringList('watched_crops', _watchedCrops);
   }
 }
+
