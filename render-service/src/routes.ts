@@ -11,6 +11,16 @@ interface Queues {
 export function registerRoutes(fastify: FastifyInstance, queues: Queues) {
   const { trainingQueue, inferenceQueue, satelliteQueue } = queues;
 
+  // The Flutter app uses these endpoints, but no real advisory models have
+  // been integrated into this backend. Report that explicitly.
+  const modelUnavailable = async (_req: any, reply: any) => reply.status(503).send({
+    error: 'Models not configured',
+    message: 'Real crop advisory is unavailable until trained models and data are integrated. This deployment is a demo.',
+  });
+  fastify.post('/api/v1/advisory', modelUnavailable);
+  fastify.get('/api/v1/predict/yield', modelUnavailable);
+  fastify.get('/api/v1/predict/price', modelUnavailable);
+
   fastify.post('/api/v1/train/yield', async (req, reply) => {
     const schema = z.object({
       crop: z.string().min(1),

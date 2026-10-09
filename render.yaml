@@ -4,6 +4,7 @@ services:
     runtime: node
     plan: free
     region: singapore
+    branch: master
     rootDir: render-service
     buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
@@ -29,9 +30,10 @@ services:
   - type: web
     name: kisaan-ml-app
     runtime: static
-    rootDir: app
-    buildCommand: bash build-render.sh
-    staticPublishPath: build/web
+    branch: master
+    rootDir: demo
+    buildCommand: node --check dashboard.js
+    staticPublishPath: .
     routes:
       - type: rewrite
         source: /*

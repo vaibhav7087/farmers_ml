@@ -100,3 +100,9 @@ temp/
 *.DS_Store
 ehthumbs.db
 Desktop.ini
+# Track Node manifests and TypeScript configuration.
+!package.json
+!package-lock.json
+!tsconfig.json
+.tools/
+!app/pubspec.lock

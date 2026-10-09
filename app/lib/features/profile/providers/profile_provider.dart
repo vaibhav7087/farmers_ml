@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class ProfileProvider extends ChangeNotifier {
-  String _preferredLanguage = 'hi';
+  String _preferredLanguage = 'en';
   bool _notificationsEnabled = true;
   bool _darkMode = false;
   List<String> _watchedMandis = [];
@@ -17,7 +17,7 @@ class ProfileProvider extends ChangeNotifier {
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
-    _preferredLanguage = prefs.getString('language') ?? 'hi';
+    _preferredLanguage = prefs.getString('language') ?? 'en';
     _notificationsEnabled = prefs.getBool('notifications') ?? true;
     _darkMode = prefs.getBool('dark_mode') ?? false;
     _watchedMandis = prefs.getStringList('watched_mandis') ?? [];
@@ -84,3 +84,4 @@ class ProfileProvider extends ChangeNotifier {
     await prefs.setStringList('watched_crops', _watchedCrops);
   }
 }
+

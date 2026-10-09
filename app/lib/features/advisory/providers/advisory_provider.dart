@@ -52,10 +52,7 @@ class AdvisoryProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'https://kisaan-ml-api.bylancetechnologies.workers.dev/api/v1',
-  );
+  static const String baseUrl = String.fromEnvironment('API_BASE_URL', defaultValue: 'https://kisaan-ml-render.onrender.com/api/v1');
 
   Future<void> fetchAdvisory({
     required String district,
@@ -73,29 +70,30 @@ class AdvisoryProvider extends ChangeNotifier {
       final token = prefs.getString('auth_token');
 
       final uri = Uri.parse('$baseUrl/advisory');
+      final requestBody = {
+        'district': district,
+        'crop': crop,
+        'mandi': mandi,
+        if (variety != null) 'variety': variety,
+        if (sowingWeek != null) 'sowing_week': sowingWeek.toString(),
+      };
 
       final response = await http.post(
         uri,
+        body: jsonEncode(requestBody),
         headers: {
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
         },
-        body: jsonEncode({
-          'district': district,
-          'crop': crop,
-          'mandi': mandi,
-          if (variety != null) 'variety': variety,
-          if (sowingWeek != null) 'sowing_week': sowingWeek,
-        }),
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 90));
 
       if (response.statusCode == 200) {
         _currentAdvisory = AdvisoryData.fromJson(jsonDecode(response.body));
       } else {
-        _error = 'सलाह प्राप्त करने में विफल: ${response.statusCode}';
+        _error = response.statusCode == 503 ? 'This is a demo. Trained models and data for real crop advice are not yet available.' : 'Unable to retrieve advisory: ${response.statusCode}';
       }
     } catch (e) {
-      _error = 'नेटवर्क त्रुटि: ${e.toString()}';
+      _error = 'Network error: ${e.toString()}';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -126,7 +124,7 @@ class AdvisoryProvider extends ChangeNotifier {
         headers: {
           if (token != null) 'Authorization': 'Bearer $token',
         },
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 90));
 
       if (response.statusCode == 200) {
         // Handle yield prediction response
@@ -161,7 +159,7 @@ class AdvisoryProvider extends ChangeNotifier {
         headers: {
           if (token != null) 'Authorization': 'Bearer $token',
         },
-      ).timeout(const Duration(seconds: 15));
+      ).timeout(const Duration(seconds: 90));
 
       if (response.statusCode == 200) {
         print('Price prediction: ${response.body}');
@@ -177,3 +175,6 @@ class AdvisoryProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+
+

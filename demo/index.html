@@ -451,6 +451,18 @@
       color: #042f2e;
       font-weight: 600;
     }
+    .demo-notice { padding: 12px 16px; margin-bottom: 20px; border: 1px solid rgba(245,158,11,.35); background: rgba(245,158,11,.08); border-radius: 12px; color: #fcd34d; font-size: .85rem; line-height: 1.6; }
+    @media(max-width: 680px) {
+      header { padding: 1rem; flex-wrap: wrap; gap: 12px; }
+      .header-actions { flex-wrap: wrap; gap: 10px; }
+      .container { padding: 1rem; }
+      .query-controls { flex-direction: column; align-items: stretch; }
+      .control-group { width: 100%; min-width: 0; }
+      .card { padding: 1rem; min-width: 0; }
+      .card-header { flex-wrap: wrap; gap: 8px; }
+      .price-summary { flex-wrap: wrap; gap: 12px; }
+      .metric-sub { flex-wrap: wrap; gap: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -461,24 +473,25 @@
       <div class="brand-logo">🌾</div>
       <div>
         <div class="brand-title">Kisaan-ML</div>
-        <div class="brand-subtitle">Nexathon II • Production Edge Advisory</div>
+        <div class="brand-subtitle">Nexathon II • Interactive Demo</div>
       </div>
     </div>
 
     <div class="header-actions">
-      <div class="badge-live">
+      <div class="badge-live" role="status">
         <div class="pulse-dot"></div>
-        <span id="api-status-text">Cloudflare Workers Live</span>
+        <span id="api-status-text">Checking API connection</span>
       </div>
       <div>
-        <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-        <button class="lang-btn" onclick="setLanguage('hi')">हिंदी</button>
-        <button class="lang-btn" onclick="setLanguage('mr')">मराठी</button>
+        <button class="lang-btn active" onclick="setLanguage('en', this)">EN</button>
+        <button class="lang-btn" onclick="setLanguage('hi', this)">हिंदी</button>
+        <button class="lang-btn" onclick="setLanguage('mr', this)">मराठी</button>
       </div>
     </div>
   </header>
 
   <div class="container">
+    <div class="demo-notice" role="status"><strong>Interactive demo</strong> — Forecasts, market prices and alerts below are sample scenarios from this repository. Live models and data are not yet connected.</div>
     <!-- Hero / Query Bar -->
     <div class="hero-banner">
       <div class="hero-text">
@@ -488,28 +501,28 @@
 
       <div class="query-controls">
         <div class="control-group">
-          <label id="lbl-district">District</label>
+          <label id="lbl-district" for="sel-district">District</label>
           <select id="sel-district" onchange="runPrediction()">
-            <option value="yavatmal" selected>Yavatmal (यवतमाळ)</option>
-            <option value="nagpur">Nagpur (नागपूर)</option>
-            <option value="akola">Akola (अकोला)</option>
-            <option value="amravati">Amravati (अमरावती)</option>
-            <option value="nashik">Nashik (नाशिक)</option>
+            <option value="yavatmal" selected>Yavatmal</option>
+            <option value="nagpur">Nagpur</option>
+            <option value="akola">Akola</option>
+            <option value="amravati">Amravati</option>
+            <option value="nashik">Nashik</option>
           </select>
         </div>
 
         <div class="control-group">
-          <label id="lbl-crop">Crop</label>
+          <label id="lbl-crop" for="sel-crop">Crop</label>
           <select id="sel-crop" onchange="runPrediction()">
-            <option value="cotton" selected>Cotton (कपास / कापूस)</option>
-            <option value="soybean">Soybean (सोयाबीन)</option>
-            <option value="wheat">Wheat (गेहूं / गहू)</option>
-            <option value="tur">Tur / Arhar (तूर)</option>
+            <option value="cotton" selected>Cotton</option>
+            <option value="soybean">Soybean</option>
+            <option value="wheat">Wheat</option>
+            <option value="tur">Tur / Arhar</option>
           </select>
         </div>
 
         <div class="control-group">
-          <label id="lbl-mandi">Mandi Market</label>
+          <label id="lbl-mandi" for="sel-mandi">Mandi Market</label>
           <select id="sel-mandi" onchange="runPrediction()">
             <option value="yavatmal" selected>Yavatmal APMC</option>
             <option value="nagpur">Nagpur Cotton Market</option>
@@ -539,7 +552,7 @@
           <div class="metric-unit" id="yield-unit">kg / hectare at harvest</div>
           <div class="metric-sub">
             <span id="model-conf">Confidence: <strong>89.4%</strong></span>
-            <span id="model-ver">Model: <strong>v1.2 Edge ONNX</strong></span>
+            <span id="model-ver">Model: <strong>Sample scenario</strong></span>
           </div>
         </div>
 
@@ -579,7 +592,7 @@
           <canvas id="priceChart"></canvas>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--card-border);">
+        <div class="price-summary" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--card-border);">
           <div>
             <span style="font-size: 0.8rem; color: var(--text-muted);" id="lbl-curr-price">Current Spot Price:</span>
             <strong style="color: white; font-size: 1.1rem; margin-left: 6px;" id="val-curr-price">₹7,150 / Qtl</strong>
@@ -606,9 +619,9 @@
         <div id="pest-alerts-container">
           <div class="alert-pill warning">
             <div>
-              <strong style="color: #fbbf24;">Pink Bollworm Alert (गुलाबी बोंड अळी)</strong>
+              <strong style="color: #fbbf24;">Pink Bollworm Alert</strong>
               <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
-                Isolation index 0.042 (above 0.05 contamination cutoff). 32 trap reports in district.
+                Sample outbreak scenario: elevated activity based on 32 illustrative trap reports.
               </div>
             </div>
             <span style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.75rem; font-weight: 700; padding: 4px 8px; border-radius: 6px;">ELEVATED</span>
@@ -616,7 +629,7 @@
 
           <div class="alert-pill safe">
             <div>
-              <strong style="color: #34d399;">Whitefly & Jassids (पांढरी माशी)</strong>
+              <strong style="color: #34d399;">Whitefly & Jassids</strong>
               <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
                 Normal population density. No localized infestation detected.
               </div>
@@ -659,11 +672,11 @@
         <div style="background: rgba(255,255,255,0.02); border-radius: 10px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.8rem;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
             <span style="color: var(--text-muted);">PIB Policy RSS Stream:</span>
-            <span style="color: #34d399; font-weight: 600;">Active Policy Monitoring</span>
+            <span style="color: #34d399; font-weight: 600;">Sample policy scenario</span>
           </div>
           <div style="color: #d1d5db;">
             • MSP Kharif 2024 Cotton revision accounted in LightGBM lag features.<br>
-            • Zero synthetic fallback rule enforced across all active pipelines.
+            • The panels illustrate the planned data pipelines using sample values.
           </div>
         </div>
       </div>
@@ -677,7 +690,7 @@
         <div class="pitch-points" style="margin-top: 6px;">
           <span class="pitch-point">1. <strong>Problem:</strong> Climate uncertainty & price volatility for Indian farmers.</span>
           <span class="pitch-point">2. <strong>Data:</strong> Sentinel-2 + IMD Weather + AgMarkNet + Soil Health.</span>
-          <span class="pitch-point">3. <strong>Edge ML:</strong> Sub-50ms inference via Cloudflare Workers ONNX.</span>
+          <span class="pitch-point">3. <strong>Architecture:</strong> Cloudflare Workers + Render + Flutter.</span>
         </div>
       </div>
       <div style="display: flex; gap: 8px;">
@@ -688,252 +701,6 @@
 
   </div>
 
-  <script>
-    let priceChart = null;
-    let currentLang = 'en';
-
-    const translations = {
-      en: {
-        heroTitle: "Real-Time Farmer Intelligence & Mandi Forecast",
-        heroSubtitle: "Multi-modal fusion of Sentinel-2 satellite STAC, IMD gridded weather, & AgMarkNet mandi prices",
-        yieldTitle: "Yield Forecast",
-        priceTitle: "14-Day Mandi Price Prediction",
-        pestTitle: "Pest & Disease Outbreak Surveillance",
-        satelliteTitle: "Sentinel-2 & Soil Health Card Fusion",
-        runBtn: "⚡ Run Advisory",
-        currPrice: "Current Spot Price:",
-        projPrice: "14-Day Forecast:"
-      },
-      hi: {
-        heroTitle: "किसान एआई सलाहकार एवं मंडी मूल्य पूर्वानुमान",
-        heroSubtitle: "सेंटिनल-2 उपग्रह, मौसम विभाग (IMD) और एगमार्कनेट मंडी डेटा का बहुआयामी विश्लेषण",
-        yieldTitle: "उपज पूर्वानुमान",
-        priceTitle: "14-दिवसीय मंडी भाव पूर्वानुमान",
-        pestTitle: "कीट एवं रोग प्रकोप निगरानी",
-        satelliteTitle: "उपग्रह एवं मृदा स्वास्थ्य कार्ड संलयन",
-        runBtn: "⚡ सलाह प्राप्त करें",
-        currPrice: "वर्तमान मंडी भाव:",
-        projPrice: "14-दिन का अनुमान:"
-      },
-      mr: {
-        heroTitle: "शेतकरी एआय सल्लागार आणि बाजारभाव अंदाज",
-        heroSubtitle: "सेंटिनेल-२ उपग्रह, हवामान विभाग आणि ॲगमार्कनेट बाजारभाव आकडेवारीचे एकत्रीकरण",
-        yieldTitle: "उत्पादन अंदाज",
-        priceTitle: "१४-दिवसीय बाजारभाव अंदाज",
-        pestTitle: "कीड व रोग प्रादुर्भाव इशारा",
-        satelliteTitle: "उपग्रह व मृदा आरोग्य पत्रिका विश्लेषण",
-        runBtn: "⚡ सल्ला मिळवा",
-        currPrice: "आजचा बाजारभाव:",
-        projPrice: "१४ दिवसांचा अंदाज:"
-      }
-    };
-
-    const CROP_DATA = {
-      cotton: {
-        yieldKg: 1820,
-        unit: 'kg / hectare',
-        confidence: '89.4%',
-        ndvi: '0.68',
-        rain: '842 mm',
-        soil: '7.2 pH',
-        spotPrice: 7150,
-        forecastPrice: 7480,
-        change: '+4.6%',
-        prices: [7100, 7120, 7150, 7190, 7230, 7280, 7310, 7350, 7390, 7420, 7450, 7460, 7475, 7480],
-        adv: "Optimal harvest moisture. Recommendation: HOLD harvest by 7 days for peak mandi price realization.",
-        advHi: "मिट्टी में नमी अनुकूल है। अधिकतम मंडी भाव प्राप्त करने के लिए फसल को 7 दिन रोककर बेचें।",
-        advMr: "जमिनीतील ओलावा योग्य आहे. जास्तीत जास्त बाजारभाव मिळवण्यासाठी शेतमाल ७ दिवस राखून ठेवा."
-      },
-      soybean: {
-        yieldKg: 2150,
-        unit: 'kg / hectare',
-        confidence: '92.1%',
-        ndvi: '0.74',
-        rain: '910 mm',
-        soil: '6.8 pH',
-        spotPrice: 4650,
-        forecastPrice: 4890,
-        change: '+5.2%',
-        prices: [4620, 4640, 4650, 4680, 4710, 4750, 4780, 4810, 4830, 4850, 4870, 4880, 4890, 4890],
-        adv: "Strong export demand and MSP support. Sell 50% lot at ₹4,850+ target.",
-        advHi: "मजबूत निर्यात मांग और एमएसपी समर्थन। ₹4,850+ के लक्ष्य पर 50% उपज बेचें।",
-        advMr: "चांगली निर्यात मागणी आणि हमीभाव आधार. ₹४,८५०+ भावावर ५०% माल विका."
-      },
-      wheat: {
-        yieldKg: 3450,
-        unit: 'kg / hectare',
-        confidence: '94.0%',
-        ndvi: '0.81',
-        rain: '320 mm',
-        soil: '7.5 pH',
-        spotPrice: 2420,
-        forecastPrice: 2490,
-        change: '+2.9%',
-        prices: [2400, 2410, 2420, 2430, 2445, 2450, 2460, 2470, 2475, 2480, 2485, 2490, 2490, 2490],
-        adv: "Stable domestic procurement. Normal seasonal mandi trends.",
-        advHi: "स्थिर सरकारी खरीद और सामान्य मौसमी मंडी रुझान।",
-        advMr: "स्थिर शासकीय खरेदी आणि सर्वसाधारण बाजार कल."
-      },
-      tur: {
-        yieldKg: 1120,
-        unit: 'kg / hectare',
-        confidence: '86.5%',
-        ndvi: '0.62',
-        rain: '780 mm',
-        soil: '7.0 pH',
-        spotPrice: 10400,
-        forecastPrice: 10950,
-        change: '+5.3%',
-        prices: [10200, 10300, 10400, 10450, 10550, 10620, 10700, 10780, 10840, 10890, 10910, 10930, 10940, 10950],
-        adv: "Tight pulse supply buffer. High probability of crossing ₹11,000 threshold.",
-        advHi: "दालों की तंग आपूर्ति। ₹11,000 की सीमा पार करने की उच्च संभावना।",
-        advMr: "डाळींचा तुटवडा. ₹११,००० चा टप्पा ओलांडण्याची दाट शक्यता."
-      }
-    };
-
-    function initChart() {
-      const ctx = document.getElementById('priceChart').getContext('2d');
-      const labels = Array.from({length: 14}, (_, i) => `Day +${i + 1}`);
-
-      const gradient = ctx.createLinearGradient(0, 0, 0, 250);
-      gradient.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
-      gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
-
-      priceChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Holt-Winters + LightGBM Mandi Forecast (₹/Qtl)',
-            data: CROP_DATA.cotton.prices,
-            borderColor: '#10b981',
-            backgroundColor: gradient,
-            borderWidth: 3,
-            fill: true,
-            tension: 0.35,
-            pointBackgroundColor: '#34d399',
-            pointRadius: 4,
-            pointHoverRadius: 7
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              labels: { color: '#9ca3af', font: { family: 'Inter', size: 12 } }
-            },
-            tooltip: {
-              backgroundColor: '#111827',
-              borderColor: 'rgba(16, 185, 129, 0.4)',
-              borderWidth: 1,
-              titleColor: '#34d399',
-              bodyColor: '#fff',
-              callbacks: {
-                label: (c) => ` Projected Price: ₹${c.parsed.y} / Quintal`
-              }
-            }
-          },
-          scales: {
-            x: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#9ca3af', font: { size: 11 } }
-            },
-            y: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: {
-                color: '#9ca3af',
-                callback: (val) => `₹${val}`
-              }
-            }
-          }
-        }
-      });
-    }
-
-    async function runPrediction() {
-      const crop = document.getElementById('sel-crop').value;
-      const district = document.getElementById('sel-district').value;
-      const data = CROP_DATA[crop] || CROP_DATA.cotton;
-
-      // Try live API call to Cloudflare Worker
-      try {
-        const resp = await fetch(`https://kisaan-ml-api.bylancetechnologies.workers.dev/api/v1/predict/yield?district=${district}&crop=${crop}`);
-        if (resp.ok) {
-          const apiData = await resp.json();
-          if (apiData.predicted_yield_kg_per_ha) {
-            document.getElementById('yield-value').innerText = apiData.predicted_yield_kg_per_ha.toLocaleString();
-            document.getElementById('model-ver').innerHTML = `Model: <strong>${apiData.model_version || 'CF-Worker Edge'}</strong>`;
-            document.getElementById('api-status-text').innerText = "Live Cloudflare Worker Active";
-          }
-        }
-      } catch (e) {
-        console.warn("Live API fallback used:", e);
-      }
-
-      // Update UI metrics
-      if (!document.getElementById('yield-value').innerText || document.getElementById('yield-value').innerText === '...') {
-        document.getElementById('yield-value').innerText = data.yieldKg.toLocaleString();
-      }
-      document.getElementById('model-conf').innerHTML = `Confidence: <strong>${data.confidence}</strong>`;
-      document.getElementById('fusion-ndvi').innerText = data.ndvi;
-      document.getElementById('fusion-rain').innerText = data.rain;
-      document.getElementById('fusion-soil').innerText = data.soil;
-
-      document.getElementById('val-curr-price').innerText = `₹${data.spotPrice.toLocaleString()} / Qtl`;
-      document.getElementById('val-proj-price').innerText = `₹${data.forecastPrice.toLocaleString()} / Qtl (${data.change})`;
-
-      // Advisory text
-      if (currentLang === 'hi') {
-        document.getElementById('yield-adv-text').innerText = data.advHi;
-      } else if (currentLang === 'mr') {
-        document.getElementById('yield-adv-text').innerText = data.advMr;
-      } else {
-        document.getElementById('yield-adv-text').innerText = data.adv;
-      }
-
-      // Update Chart
-      if (priceChart) {
-        priceChart.data.datasets[0].data = data.prices;
-        priceChart.update();
-      }
-    }
-
-    function setLanguage(lang) {
-      currentLang = lang;
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-      event.target.classList.add('active');
-
-      const t = translations[lang];
-      document.getElementById('hero-title').innerText = t.heroTitle;
-      document.getElementById('hero-subtitle').innerText = t.heroSubtitle;
-      document.getElementById('card-yield-title').innerText = t.yieldTitle;
-      document.getElementById('card-price-title').innerText = t.priceTitle;
-      document.getElementById('card-pest-title').innerText = t.pestTitle;
-      document.getElementById('card-satellite-title').innerText = t.satelliteTitle;
-      document.getElementById('btn-predict-text').innerText = t.runBtn;
-      document.getElementById('lbl-curr-price').innerText = t.currPrice;
-      document.getElementById('lbl-proj-price').innerText = t.projPrice;
-
-      runPrediction();
-    }
-
-    function simulateStory(cropType) {
-      document.getElementById('sel-crop').value = cropType;
-      if (cropType === 'soybean') {
-        document.getElementById('sel-district').value = 'nagpur';
-        document.getElementById('sel-mandi').value = 'nagpur';
-      } else {
-        document.getElementById('sel-district').value = 'yavatmal';
-        document.getElementById('sel-mandi').value = 'yavatmal';
-      }
-      runPrediction();
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      initChart();
-      runPrediction();
-    });
-  </script>
+  <script src="dashboard.js"></script>
 </body>
 </html>
