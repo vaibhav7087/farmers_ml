@@ -11,7 +11,7 @@
     <script>
     (async function () {
       // Upgrade old Flutter offline caches without clearing saved profiles.
-      const version = '2026-10-09-v2';
+      const version = '2026-10-09-v3';
       if (localStorage.getItem('kisaan-web-cache-version') !== version) {
         if ('serviceWorker' in navigator) {
           const registrations = await navigator.serviceWorker.getRegistrations();

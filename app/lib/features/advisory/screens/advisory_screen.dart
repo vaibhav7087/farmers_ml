@@ -14,27 +14,27 @@ class AdvisoryScreen extends StatefulWidget {
 }
 
 class _AdvisoryScreenState extends State<AdvisoryScreen> {
-  String _selectedCrop = 'कपास';
-  String _selectedDistrict = 'यवतमाळ';
-  String _selectedMandi = 'यवतमाळ मंडी';
+  String _selectedCrop = 'Cotton';
+  String _selectedDistrict = 'Yavatmal';
+  String _selectedMandi = 'Yavatmal Mandi';
   String? _selectedVariety;
   int _sowingWeek = 26;
   bool _useSatellite = true;
 
-  final List<String> _crops = ['कपास', 'सोयाबीन', 'मक्का', 'गेहूं', 'चावल', 'तुअर'];
-  final List<String> _districts = ['यवतमाळ', 'अमरावती', 'अकोला', 'वर्धा', 'नागपुर'];
-  final List<String> _mandis = ['यवतमाळ मंडी', 'अमरावती मंडी', 'अकोला मंडी', 'वर्धा मंडी', 'नागपुर मंडी'];
+  final List<String> _crops = ['Cotton', 'Soybean', 'Maize', 'Wheat', 'Rice', 'Pigeon pea'];
+  final List<String> _districts = ['Yavatmal', 'Amravati', 'Akola', 'Wardha', 'Nagpur'];
+  final List<String> _mandis = ['Yavatmal Mandi', 'Amravati Mandi', 'Akola Mandi', 'Wardha Mandi', 'Nagpur Mandi'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('फसल सलाह'),
+        title: const Text('Crop advisory'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadAdvisory,
-            tooltip: 'सलाह रीफ्रेश करें',
+            tooltip: 'Refresh advisory',
           ),
         ],
       ),
@@ -70,14 +70,14 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('अपनी फसल और स्थान चुनें', style: Theme.of(context).textTheme.titleMedium),
+            Text('Choose your crop and location', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedCrop,
-                    decoration: const InputDecoration(labelText: 'फसल', prefixIcon: Icon(Icons.grass)),
+                    decoration: const InputDecoration(labelText: 'Crop', prefixIcon: Icon(Icons.grass)),
                     items: _crops.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                     onChanged: (v) => setState(() => _selectedCrop = v!),
                   ),
@@ -86,7 +86,7 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedDistrict,
-                    decoration: const InputDecoration(labelText: 'जिला', prefixIcon: Icon(Icons.location_on)),
+                    decoration: const InputDecoration(labelText: 'District', prefixIcon: Icon(Icons.location_on)),
                     items: _districts.map((d) => DropdownMenuItem(value: d, child: Text(d))).toList(),
                     onChanged: (v) => setState(() => _selectedDistrict = v!),
                   ),
@@ -99,7 +99,7 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedMandi,
-                    decoration: const InputDecoration(labelText: 'मंडी', prefixIcon: Icon(Icons.store)),
+                    decoration: const InputDecoration(labelText: 'Mandi', prefixIcon: Icon(Icons.store)),
                     items: _mandis.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
                     onChanged: (v) => setState(() => _selectedMandi = v!),
                   ),
@@ -108,8 +108,8 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     value: _selectedVariety,
-                    decoration: const InputDecoration(labelText: 'किस्म (वैकल्पिक)', prefixIcon: Icon(Icons.category)),
-                    items: ['हाइब्रिड', 'देसी', 'उन्नत'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                    decoration: const InputDecoration(labelText: 'Variety (optional)', prefixIcon: Icon(Icons.category)),
+                    items: ['Hybrid', 'Local', 'Improved'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
                     onChanged: (v) => setState(() => _selectedVariety = v),
                   ),
                 ),
@@ -121,15 +121,15 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
                 Expanded(
                   child: DropdownButtonFormField<int>(
                     value: _sowingWeek,
-                    decoration: const InputDecoration(labelText: 'बुवाई सप्ताह', prefixIcon: Icon(Icons.calendar_today)),
-                    items: List.generate(52, (i) => i + 1).map((w) => DropdownMenuItem(value: w, child: Text('सप्ताह $w'))).toList(),
+                    decoration: const InputDecoration(labelText: 'Sowing week', prefixIcon: Icon(Icons.calendar_today)),
+                    items: List.generate(52, (i) => i + 1).map((w) => DropdownMenuItem(value: w, child: Text('Week $w'))).toList(),
                     onChanged: (v) => setState(() => _sowingWeek = v!),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: SwitchListTile(
-                    title: const Text('सैटेलाइट डेटा'),
+                    title: const Text('Satellite data'),
                     value: true,
                     onChanged: (v) {},
                     contentPadding: EdgeInsets.zero,
@@ -150,7 +150,7 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
         Expanded(
           child: OutlinedButton.icon(
             icon: const Icon(Icons.grass),
-            label: const Text('उपज पूर्वानुमान'),
+            label: const Text('Yield forecast'),
             onPressed: () => _loadYieldOnly(),
           ),
         ),
@@ -158,7 +158,7 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
         Expanded(
           child: OutlinedButton.icon(
             icon: const Icon(Icons.trending_up),
-            label: const Text('भाव पूर्वानुमान'),
+            label: const Text('Price forecast'),
             onPressed: () => _loadPriceOnly(),
           ),
         ),
@@ -186,25 +186,25 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('सलाह सारांश', style: Theme.of(context).textTheme.titleLarge),
+        Text('Advisory summary', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: _buildMetricCard('उपज पूर्वानुमान', '${data.predictedYield.toInt()} kg/ha', Icons.grass, AppTheme.primaryGreen)),
+            Expanded(child: _buildMetricCard('Yield forecast', '${data.predictedYield.toInt()} kg/ha', Icons.grass, AppTheme.primaryGreen)),
             const SizedBox(width: 12),
-            Expanded(child: _buildMetricCard('भाव पूर्वानुमान', '₹${data.predictedPrice.toInt()}/क्विंटल', Icons.trending_up, AppTheme.accentOrange)),
+            Expanded(child: _buildMetricCard('Price forecast', '₹${data.predictedPrice.toInt()}/quintal', Icons.trending_up, AppTheme.accentOrange)),
           ],
         ),
         const SizedBox(height: 12),
         Row(
           children: [
-            Expanded(child: _buildMetricCard('कुल राजस्व', '₹${data.grossRevenue.toInt()}/हेक्टेयर', Icons.currency_rupee, Colors.blue)),
+            Expanded(child: _buildMetricCard('Gross revenue', '₹${data.grossRevenue.toInt()}/hectare', Icons.currency_rupee, Colors.blue)),
             const SizedBox(width: 12),
-            Expanded(child: _buildMetricCard('शुद्ध लाभ', '₹${data.netProfit.toInt()}/हेक्टेयर', Icons.savings, Colors.green)),
+            Expanded(child: _buildMetricCard('Net profit', '₹${data.netProfit.toInt()}/hectare', Icons.savings, Colors.green)),
           ],
         ),
         const SizedBox(height: 24),
-        Text('सिफारिशें', style: Theme.of(context).textTheme.titleMedium),
+        Text('Recommendations', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 12),
         ...data.recommendations.map((r) => Card(
           child: ListTile(
@@ -218,7 +218,7 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
             Expanded(
               child: OutlinedButton.icon(
                 icon: const Icon(Icons.grass),
-                label: const Text('उपज विवरण'),
+                label: const Text('Yield details'),
                 onPressed: () => context.go('/advisory/yield/$_selectedDistrict/$_selectedCrop'),
               ),
             ),
@@ -226,14 +226,14 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
             Expanded(
               child: OutlinedButton.icon(
                 icon: const Icon(Icons.trending_up),
-                label: const Text('भाव विवरण'),
+                label: const Text('Price details'),
                 onPressed: () => context.go('/advisory/price/$_selectedMandi/$_selectedCrop'),
               ),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        Text('अंतिम अपडेट: ${data.generatedAt.toLocal().toString().substring(0, 19)}', style: Theme.of(context).textTheme.bodySmall),
+        Text('Last updated: ${data.generatedAt.toLocal().toString().substring(0, 19)}', style: Theme.of(context).textTheme.bodySmall),
       ],
     );
   }

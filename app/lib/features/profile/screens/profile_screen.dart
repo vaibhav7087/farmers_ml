@@ -13,12 +13,12 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('प्रोफाइल'),
+        title: const Text('Profile'),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () => context.go('/settings'),
-            tooltip: 'सेटिंग्स',
+            tooltip: 'Settings',
           ),
         ],
       ),
@@ -60,7 +60,7 @@ class ProfileScreen extends StatelessWidget {
               radius: 50,
               backgroundColor: AppTheme.primaryGreen,
               child: Text(
-                user.name.isNotEmpty ? user.name[0] : 'क',
+                user.name.isNotEmpty ? user.name[0] : 'F',
                 style: const TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold),
               ),
             ),
@@ -72,11 +72,11 @@ class ProfileScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildStatChip(context, 'फसलें', user.crops.length.toString()),
+                _buildStatChip(context, 'Crops', user.crops.length.toString()),
                 const SizedBox(width: 12),
-                _buildStatChip(context, 'देखी जा रही', '3'),
+                _buildStatChip(context, 'Watching', '3'),
                 const SizedBox(width: 12),
-                _buildStatChip(context, 'अलर्ट', '5'),
+                _buildStatChip(context, 'Alerts', '5'),
               ],
             ),
           ],
@@ -105,13 +105,13 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('व्यक्तिगत जानकारी', style: Theme.of(context).textTheme.titleMedium),
+            Text('Personal information', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
-            _buildInfoRow(context, Icons.person, 'नाम', user.name),
-            _buildInfoRow(context, Icons.phone, 'फोन', user.phone.isNotEmpty ? user.phone : 'नहीं जोड़ा गया'),
-            _buildInfoRow(context, Icons.location_on, 'जिला', user.district),
-            _buildInfoRow(context, Icons.location_city, 'राज्य', user.state),
-            _buildInfoRow(context, Icons.language, 'भाषा', _getLanguageName(user.language)),
+            _buildInfoRow(context, Icons.person, 'Name', user.name),
+            _buildInfoRow(context, Icons.phone, 'Phone', user.phone.isNotEmpty ? user.phone : 'Not added'),
+            _buildInfoRow(context, Icons.location_on, 'District', user.district),
+            _buildInfoRow(context, Icons.location_city, 'State', user.state),
+            _buildInfoRow(context, Icons.language, 'Language', _getLanguageName(user.language)),
           ],
         ),
       ),
@@ -120,8 +120,8 @@ class ProfileScreen extends StatelessWidget {
 
   String _getLanguageName(String code) {
     switch (code) {
-      case 'hi': return 'हिंदी';
-      case 'mr': return 'मराठी';
+      case 'hi': return 'Hindi';
+      case 'mr': return 'Marathi';
       default: return 'English';
     }
   }
@@ -151,11 +151,11 @@ class ProfileScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('मेरी फसलें', style: Theme.of(context).textTheme.titleMedium),
+                Text('My crops', style: Theme.of(context).textTheme.titleMedium),
                 TextButton.icon(
                   onPressed: () => _editCrops(context),
                   icon: const Icon(Icons.edit, size: 18),
-                  label: const Text('संपादित'),
+                  label: const Text('Edit'),
                 ),
               ],
             ),
@@ -180,9 +180,9 @@ class ProfileScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('फसलें संपादित करें'),
-        content: const Text('यह फीचर जल्द आ रहा है। अभी प्रोफाइल सेटिंग्स से जोड़ें।'),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('ठीक है'))],
+        title: const Text('Edit crops'),
+        content: const Text('This feature is coming soon. Use profile settings for now.'),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
       ),
     );
   }
@@ -197,10 +197,10 @@ class ProfileScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('देखी जा रही मंडियां', style: Theme.of(context).textTheme.titleMedium),
+                Text('Watched markets', style: Theme.of(context).textTheme.titleMedium),
                 TextButton(
                   onPressed: () => Navigator.of(context).pushNamed('/market'),
-                  child: const Text('सभी देखें'),
+                  child: const Text('View all'),
                 ),
               ],
             ),
@@ -208,7 +208,7 @@ class ProfileScreen extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: ['यवतमाळ मंडी', 'अमरावती मंडी', 'नागपुर मंडी']
+              children: ['Yavatmal Mandi', 'Amravati Mandi', 'Nagpur Mandi']
                   .map((m) => Chip(
                 label: Text(m),
                 avatar: const Icon(Icons.store, size: 16),
@@ -230,7 +230,7 @@ class ProfileScreen extends StatelessWidget {
           width: double.infinity,
           child: OutlinedButton.icon(
             icon: const Icon(Icons.logout),
-            label: const Text('लॉगआउट'),
+            label: const Text('Log out'),
             onPressed: () async {
               await auth.logout();
               if (context.mounted) context.go('/login');

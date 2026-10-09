@@ -13,7 +13,7 @@ class PriceDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('$crop भाव विवरण - $mandi'),
+        title: Text('$crop Price details - $mandi'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -44,9 +44,9 @@ class PriceDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat(context, 'वर्तमान भाव', '₹5,850/क्विंटल', Icons.currency_rupee, AppTheme.primaryGreen),
-                _buildStat(context, '14-दिन पूर्वानुमान', '₹6,120/क्विंटल', Icons.trending_up, AppTheme.accentOrange),
-                _buildStat(context, 'आत्मविश्वास', '72%', Icons.verified, Colors.blue),
+                _buildStat(context, 'Current price', '₹5,850/quintal', Icons.currency_rupee, AppTheme.primaryGreen),
+                _buildStat(context, '14-day forecast', '₹6,120/quintal', Icons.trending_up, AppTheme.accentOrange),
+                _buildStat(context, 'Confidence', '72%', Icons.verified, Colors.blue),
               ],
             ),
             const SizedBox(height: 16),
@@ -54,9 +54,9 @@ class PriceDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat(context, 'साप्ताहिक परिवर्तन', '+4.6%', Icons.percent, Colors.green),
-                _buildStat(context, 'मासिक परिवर्तन', '+8.2%', Icons.show_chart, Colors.green),
-                _buildStat(context, 'नीति प्रभाव', '+₹270', Icons.gavel, AppTheme.accentOrange),
+                _buildStat(context, 'Weekly change', '+4.6%', Icons.percent, Colors.green),
+                _buildStat(context, 'Monthly change', '+8.2%', Icons.show_chart, Colors.green),
+                _buildStat(context, 'Policy impact', '+₹270', Icons.gavel, AppTheme.accentOrange),
               ],
             ),
           ],
@@ -89,12 +89,12 @@ class PriceDetailScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text('भाव प्रवृत्ति (14 दिन)', style: Theme.of(context).textTheme.titleMedium),
+                Text('Price trend (14 days)', style: Theme.of(context).textTheme.titleMedium),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(color: AppTheme.accentOrange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                  child: Text('नीति प्रभाव शामिल', style: TextStyle(color: AppTheme.accentOrange, fontSize: 12, fontWeight: FontWeight.w600)),
+                  child: Text('Includes policy impact', style: TextStyle(color: AppTheme.accentOrange, fontSize: 12, fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
@@ -110,7 +110,7 @@ class PriceDetailScreen extends StatelessWidget {
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
-                          const days = ['आज', '2', '4', '6', '8', '10', '12', '14'];
+                          const days = ['Today', '2', '4', '6', '8', '10', '12', '14'];
                           return SideTitleWidget(child: Text(days[value.toInt() % 8]), axisSide: AxisSide.bottom);
                         },
                       ),
@@ -142,9 +142,9 @@ class PriceDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildLegend(context, AppTheme.accentOrange, 'नीति-समायोजित पूर्वानुमान'),
+                _buildLegend(context, AppTheme.accentOrange, 'Policy-adjusted forecast'),
                 const SizedBox(width: 24),
-                _buildLegend(context, Colors.grey[400]!, 'बेसलाइन (कोई नीति नहीं)'),
+                _buildLegend(context, Colors.grey[400]!, 'Baseline (no policy)'),
               ],
             ),
           ],
@@ -176,13 +176,13 @@ class PriceDetailScreen extends StatelessWidget {
               children: [
                 const Icon(Icons.gavel, color: AppTheme.accentOrange),
                 const SizedBox(width: 8),
-                Text('नीति घटनाएं (भाव प्रभाव)', style: Theme.of(context).textTheme.titleMedium),
+                Text('Policy events (price impact)', style: Theme.of(context).textTheme.titleMedium),
               ],
             ),
             const SizedBox(height: 16),
-            _buildPolicyItem(context, 'MSP वृद्धि घोषणा', '+₹270/क्विंटल', 'केंद्र सरकार ने कपास MSP ₹7,200 से ₹7,470 किया', '2 दिन पहले'),
-            _buildPolicyItem(context, 'निर्यात प्रतिबंध हटाया', '+₹150/क्विंटल', 'कपास निर्यात पर प्रतिबंध हटाया गया', '1 सप्ताह पहले'),
-            _buildPolicyItem(context, 'खरीद लक्ष्य बढ़ाया', '+₹120/क्विंटल', 'CCI खरीद लक्ष्य 25% बढ़ाया', '3 दिन पहले'),
+            _buildPolicyItem(context, 'MSP increase announced', '+₹270/quintal', 'The government raised cotton MSP from ₹7,200 to ₹7,470', '2 days ago'),
+            _buildPolicyItem(context, 'Export ban lifted', '+₹150/quintal', 'The cotton export ban was lifted', '1 week ago'),
+            _buildPolicyItem(context, 'Procurement target increased', '+₹120/quintal', 'CCI procurement target increased by 25%', '3 days ago'),
           ],
         ),
       ),
@@ -230,11 +230,11 @@ class PriceDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ट्रेडिंग सिग्नल', style: Theme.of(context).textTheme.titleMedium),
+            Text('Trading signals', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
-            _buildSignal(context, 'खरीदें / होल्ड करें', 'भाव ऊपर की ओर - 14 दिन में +4.6% अपेक्षित', Icons.trending_up, Colors.green),
-            _buildSignal(context, 'बेचने में जल्दी न करें', 'नीति समर्थन मजबूत - MSP + निर्यात खुला', Icons.shield, Colors.blue),
-            _buildSignal(context, 'दूसरे सप्ताह नजर रखें', 'सप्ताह 2 में मामूली सुधार संभव', Icons.visibility, AppTheme.accentOrange),
+            _buildSignal(context, 'Buy / hold', 'Prices trending up - +4.6% expected in 14 days', Icons.trending_up, Colors.green),
+            _buildSignal(context, 'Avoid rushing to sell', 'Strong policy support - MSP and open exports', Icons.shield, Colors.blue),
+            _buildSignal(context, 'Monitor the second week', 'A small correction is possible in week 2', Icons.visibility, AppTheme.accentOrange),
           ],
         ),
       ),
@@ -277,13 +277,13 @@ class PriceDetailScreen extends StatelessWidget {
               children: [
                 const Icon(Icons.calendar_today, color: AppTheme.primaryGreen),
                 const SizedBox(width: 8),
-                Text('कार्रवाई योजना', style: Theme.of(context).textTheme.titleMedium),
+                Text('Action plan', style: Theme.of(context).textTheme.titleMedium),
               ],
             ),
             const SizedBox(height: 16),
-            _buildActionWeek(context, 'सप्ताह 1 (आज-7 दिन)', 'होल्ड करें - भाव चढ़ रहा है', 'बिक्री न करें', Colors.green),
-            _buildActionWeek(context, 'सप्ताह 2 (8-14 दिन)', 'बाजार नजर रखें - मामूली सुधार संभव', 'आंशिक बिक्री पर विचार', AppTheme.accentOrange),
-            _buildActionWeek(context, 'सप्ताह 3-4', 'नीति अपडेट जांचें - MCI खरीद शुरू', 'तैयार रहें', Colors.blue),
+            _buildActionWeek(context, 'Week 1 (today to day 7)', 'Hold - prices are rising', 'Do not sell', Colors.green),
+            _buildActionWeek(context, 'Week 2 (days 8-14)', 'Monitor the market - a small correction is possible', 'Consider a partial sale', AppTheme.accentOrange),
+            _buildActionWeek(context, 'Week 3-4', 'Check policy updates - MCI procurement begins', 'Be prepared', Colors.blue),
           ],
         ),
       ),

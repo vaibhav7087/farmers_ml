@@ -14,23 +14,23 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
   late TabController _tabController;
 
   final List<MandiPrice> _watchedPrices = [
-    MandiPrice('कपास', 'यवतमाळ मंडी', 'हाइब्रिड', 5920, 5850, '+1.2%', Icons.trending_up, Colors.green),
-    MandiPrice('सोयाबीन', 'अमरावती मंडी', 'जेएस-9560', 4150, 4200, '-1.2%', Icons.trending_down, Colors.red),
-    MandiPrice('मक्का', 'वर्धा मंडी', 'हाइब्रिड-25', 1850, 1830, '+1.1%', Icons.trending_up, Colors.green),
-    MandiPrice('गेहूं', 'नागपुर मंडी', 'लोकवन', 2150, 2140, '+0.5%', Icons.trending_up, Colors.green),
+    MandiPrice('Cotton', 'Yavatmal Mandi', 'Hybrid', 5920, 5850, '+1.2%', Icons.trending_up, Colors.green),
+    MandiPrice('Soybean', 'Amravati Mandi', 'JS-9560', 4150, 4200, '-1.2%', Icons.trending_down, Colors.red),
+    MandiPrice('Maize', 'Wardha Mandi', 'Hybrid-25', 1850, 1830, '+1.1%', Icons.trending_up, Colors.green),
+    MandiPrice('Wheat', 'Nagpur Mandi', 'Lokwan', 2150, 2140, '+0.5%', Icons.trending_up, Colors.green),
   ];
 
   final List<MandiPrice> _allPrices = [
-    MandiPrice('कपास', 'यवतमाळ मंडी', 'हाइब्रिड', 5920, 5850, '+1.2%', Icons.trending_up, Colors.green),
-    MandiPrice('कपास', 'अमरावती मंडी', 'हाइब्रिड', 5890, 5820, '+1.2%', Icons.trending_up, Colors.green),
-    MandiPrice('कपास', 'अकोला मंडी', 'देसी', 5450, 5400, '+0.9%', Icons.trending_up, Colors.green),
-    MandiPrice('सोयाबीन', 'अमरावती मंडी', 'जेएस-9560', 4150, 4200, '-1.2%', Icons.trending_down, Colors.red),
-    MandiPrice('सोयाबीन', 'यवतमाळ मंडी', 'जेएस-9560', 4180, 4220, '-0.9%', Icons.trending_down, Colors.red),
-    MandiPrice('मक्का', 'वर्धा मंडी', 'हाइब्रिड-25', 1850, 1830, '+1.1%', Icons.trending_up, Colors.green),
-    MandiPrice('मक्का', 'नागपुर मंडी', 'हाइब्रिड-30', 1870, 1850, '+1.1%', Icons.trending_up, Colors.green),
-    MandiPrice('गेहूं', 'नागपुर मंडी', 'लोकवन', 2150, 2140, '+0.5%', Icons.trending_up, Colors.green),
-    MandiPrice('गेहूं', 'अकोला मंडी', 'शरबती', 2200, 2180, '+0.9%', Icons.trending_up, Colors.green),
-    MandiPrice('तुअर', 'यवतमाळ मंडी', 'पीडीएम-2', 6200, 6150, '+0.8%', Icons.trending_up, Colors.green),
+    MandiPrice('Cotton', 'Yavatmal Mandi', 'Hybrid', 5920, 5850, '+1.2%', Icons.trending_up, Colors.green),
+    MandiPrice('Cotton', 'Amravati Mandi', 'Hybrid', 5890, 5820, '+1.2%', Icons.trending_up, Colors.green),
+    MandiPrice('Cotton', 'Akola Mandi', 'Local', 5450, 5400, '+0.9%', Icons.trending_up, Colors.green),
+    MandiPrice('Soybean', 'Amravati Mandi', 'JS-9560', 4150, 4200, '-1.2%', Icons.trending_down, Colors.red),
+    MandiPrice('Soybean', 'Yavatmal Mandi', 'JS-9560', 4180, 4220, '-0.9%', Icons.trending_down, Colors.red),
+    MandiPrice('Maize', 'Wardha Mandi', 'Hybrid-25', 1850, 1830, '+1.1%', Icons.trending_up, Colors.green),
+    MandiPrice('Maize', 'Nagpur Mandi', 'Hybrid-30', 1870, 1850, '+1.1%', Icons.trending_up, Colors.green),
+    MandiPrice('Wheat', 'Nagpur Mandi', 'Lokwan', 2150, 2140, '+0.5%', Icons.trending_up, Colors.green),
+    MandiPrice('Wheat', 'Akola Mandi', 'Sharbati', 2200, 2180, '+0.9%', Icons.trending_up, Colors.green),
+    MandiPrice('Pigeon pea', 'Yavatmal Mandi', 'PDM-2', 6200, 6150, '+0.8%', Icons.trending_up, Colors.green),
   ];
 
   @override
@@ -49,24 +49,24 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('मंडी भाव'),
+        title: const Text('Market prices'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(icon: Icon(Icons.star), text: 'मेरी फसलें'),
-            Tab(icon: Icon(Icons.list), text: 'सभी भाव'),
+            Tab(icon: Icon(Icons.star), text: 'My crops'),
+            Tab(icon: Icon(Icons.list), text: 'All prices'),
           ],
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
             onPressed: _showFilterDialog,
-            tooltip: 'फिल्टर',
+            tooltip: 'Filter',
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _refreshPrices,
-            tooltip: 'रीफ्रेश',
+            tooltip: 'Refresh',
           ),
         ],
       ),
@@ -80,7 +80,7 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
       floatingActionButton: FloatingActionButton(
         onPressed: _addWatchedCrop,
         child: const Icon(Icons.add),
-        tooltip: 'फसल जोड़ें',
+        tooltip: 'Add crop',
       ),
     );
   }
@@ -93,9 +93,9 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
           children: [
             Icon(Icons.star_border, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text('कोई फसल नहीं देखी जा रही', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey)),
+            Text('No crops are being watched', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.grey)),
             const SizedBox(height: 8),
-            Text('नीचे + बटन से फसलें जोड़ें', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600])),
+            Text('Use the + button below to add crops', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600])),
           ],
         ),
       );
@@ -159,7 +159,7 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
                       children: [
                         const Icon(Icons.star, color: Colors.amber, size: 14),
                         const SizedBox(width: 4),
-                        Text('देखा जा रहा', style: TextStyle(color: Colors.amber[800], fontSize: 11, fontWeight: FontWeight.w600)),
+                        Text('Watching', style: TextStyle(color: Colors.amber[800], fontSize: 11, fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -172,8 +172,8 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('वर्तमान भाव', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
-                      Text('₹${price.currentPrice}/क्विंटल', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: AppTheme.primaryGreen)),
+                      Text('Current price', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
+                      Text('₹${price.currentPrice}/quintal', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: AppTheme.primaryGreen)),
                     ],
                   ),
                 ),
@@ -181,8 +181,8 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('पिछला भाव', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
-                      Text('₹${price.previousPrice}/क्विंटल', style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.grey[600])),
+                      Text('Previous price', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600])),
+                      Text('₹${price.previousPrice}/quintal', style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.grey[600])),
                     ],
                   ),
                 ),
@@ -201,7 +201,7 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
                   Icon(price.icon, color: isUp ? Colors.green : Colors.red, size: 18),
                   const SizedBox(width: 8),
                   Text(
-                    '${price.change} परिवर्तन',
+                    '${price.change} change',
                     style: TextStyle(color: isUp ? Colors.green : Colors.red, fontWeight: FontWeight.w600, fontSize: 16),
                   ),
                 ],
@@ -215,12 +215,12 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
 
   Future<void> _refreshPrices() async {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('भाव रीफ्रेश हो रहे हैं...'), duration: Duration(seconds: 1)),
+      const SnackBar(content: Text('Refreshing prices...'), duration: Duration(seconds: 1)),
     );
     await Future.delayed(const Duration(seconds: 1));
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('भाव अपडेट हो गए'), duration: Duration(seconds: 1)),
+        const SnackBar(content: Text('Prices updated'), duration: Duration(seconds: 1)),
       );
     }
   }
@@ -229,23 +229,23 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('फिल्टर'),
+        title: const Text('Filter'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('फसल चुनें:'),
+            const Text('Choose a crop:'),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
-              children: ['कपास', 'सोयाबीन', 'मक्का', 'गेहूं', 'चावल', 'तुअर']
+              children: ['Cotton', 'Soybean', 'Maize', 'Wheat', 'Rice', 'Pigeon pea']
                   .map((c) => FilterChip(label: Text(c), selected: false, onSelected: (_) {}))
                   .toList(),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('रद्द')),
-          ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('लागू करें')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Apply')),
         ],
       ),
     );
@@ -255,29 +255,29 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('फसल जोड़ें'),
+        title: const Text('Add crop'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'फसल'),
-              items: ['कपास', 'सोयाबीन', 'मक्का', 'गेहूं', 'चावल', 'तुअर']
+              decoration: const InputDecoration(labelText: 'Crop'),
+              items: ['Cotton', 'Soybean', 'Maize', 'Wheat', 'Rice', 'Pigeon pea']
                   .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                   .toList(),
               onChanged: (v) {},
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'मंडी'),
-              items: ['यवतमाळ मंडी', 'अमरावती मंडी', 'अकोला मंडी', 'वर्धा मंडी', 'नागपुर मंडी']
+              decoration: const InputDecoration(labelText: 'Mandi'),
+              items: ['Yavatmal Mandi', 'Amravati Mandi', 'Akola Mandi', 'Wardha Mandi', 'Nagpur Mandi']
                   .map((m) => DropdownMenuItem(value: m, child: Text(m)))
                   .toList(),
               onChanged: (v) {},
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'किस्म'),
-              items: ['हाइब्रिड', 'देसी', 'उन्नत']
+              decoration: const InputDecoration(labelText: 'Variety'),
+              items: ['Hybrid', 'Local', 'Improved']
                   .map((v) => DropdownMenuItem(value: v, child: Text(v)))
                   .toList(),
               onChanged: (v) {},
@@ -285,8 +285,8 @@ class _MarketScreenState extends State<MarketScreen> with SingleTickerProviderSt
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('रद्द')),
-          ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('जोड़ें')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Add')),
         ],
       ),
     );

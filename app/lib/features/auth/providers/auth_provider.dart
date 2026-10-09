@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
+// Translate known sample values from profiles saved before the English UI update.
+// Unrecognized user-entered values are preserved.
+String englishProfileValue(String value) => const {
+  'किसान': 'Farmer', 'यवतमाळ': 'Yavatmal', 'अमरावती': 'Amravati',
+  'अकोला': 'Akola', 'वर्धा': 'Wardha', 'नागपुर': 'Nagpur',
+  'महाराष्ट्र': 'Maharashtra', 'कपास': 'Cotton', 'सोयाबीन': 'Soybean',
+  'मक्का': 'Maize', 'गेहूं': 'Wheat', 'चावल': 'Rice', 'तुअर': 'Pigeon pea',
+}[value] ?? value;
+
 class User {
   final String id;
   final String name;
@@ -33,11 +42,11 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) => User(
     id: json['id'],
-    name: json['name'],
+    name: englishProfileValue(json['name']),
     phone: json['phone'],
-    district: json['district'],
-    state: json['state'],
-    crops: List<String>.from(json['crops']),
+    district: englishProfileValue(json['district']),
+    state: englishProfileValue(json['state']),
+    crops: List<String>.from(json['crops']).map(englishProfileValue).toList(),
     language: json['language'],
   );
 }
@@ -81,12 +90,12 @@ class AuthProvider extends ChangeNotifier {
     // For demo, create a mock user
     final user = User(
       id: 'user_${DateTime.now().millisecondsSinceEpoch}',
-      name: 'किसान',
+      name: 'Farmer',
       phone: phone,
-      district: 'यवतमाळ',
-      state: 'महाराष्ट्र',
-      crops: ['कपास', 'सोयाबीन'],
-      language: 'hi',
+      district: 'Yavatmal',
+      state: 'Maharashtra',
+      crops: ['Cotton', 'Soybean'],
+      language: 'en',
     );
     await completeOnboarding(user);
   }

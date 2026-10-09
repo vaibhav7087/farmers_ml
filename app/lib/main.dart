@@ -31,7 +31,7 @@ class KisaanMLApp extends StatelessWidget {
         themeMode: ThemeMode.system,
         routerConfig: router,
         debugShowCheckedModeBanner: false,
-        locale: const Locale('hi', 'IN'),
+        locale: const Locale('en', 'US'),
         localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
         supportedLocales: const [
           Locale('en', 'US'),

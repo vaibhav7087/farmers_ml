@@ -17,25 +17,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      title: 'Kisaan-ML में आपका स्वागत है',
+      title: 'Welcome to Kisaan-ML',
       subtitle: 'AI-powered crop advisory for Indian farmers',
       illustration: Icons.agriculture,
       color: AppTheme.primaryGreen,
     ),
     OnboardingPage(
-      title: 'फसल उपज पूर्वानुमान',
-      subtitle: 'Satellite + Weather + Soil data से accurate yield prediction',
+      title: 'Crop yield forecasting',
+      subtitle: 'Yield predictions using satellite, weather and soil data',
       illustration: Icons.grass,
       color: AppTheme.primaryLightGreen,
     ),
     OnboardingPage(
-      title: 'मंडी भाव पूर्वानुमान',
-      subtitle: 'Policy-aware price forecasting के साथ smart selling decisions',
+      title: 'Market price forecasting',
+      subtitle: 'Plan when to sell with policy-aware price forecasts',
       illustration: Icons.trending_up,
       color: AppTheme.accentOrange,
     ),
     OnboardingPage(
-      title: 'रियल-टाइम अलर्ट',
+      title: 'Real-time alerts',
       subtitle: 'Outbreak detection + price spikes + weather warnings',
       illustration: Icons.notifications_active,
       color: AppTheme.accentRed,
@@ -82,21 +82,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: _currentPage == _pages.length - 1
                         ? ElevatedButton(
                             onPressed: () => _completeOnboarding(context),
-                            child: const Text('शुरू करें'),
+                            child: const Text('Get started'),
                           )
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               TextButton(
                                 onPressed: () => _completeOnboarding(context),
-                                child: const Text('छोड़ें'),
+                                child: const Text('Skip'),
                               ),
                               ElevatedButton(
                                 onPressed: () => _pageController.nextPage(
                                   duration: const Duration(milliseconds: 300),
                                   curve: Curves.easeInOut,
                                 ),
-                                child: const Text('आगे'),
+                                child: const Text('Next'),
                               ),
                             ],
                           ),
@@ -146,12 +146,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final auth = context.read<AuthProvider>();
     final user = User(
       id: 'user_${DateTime.now().millisecondsSinceEpoch}',
-      name: 'किसान',
+      name: 'Farmer',
       phone: '',
-      district: 'यवतमाळ',
-      state: 'महाराष्ट्र',
-      crops: ['कपास', 'सोयाबीन'],
-      language: 'hi',
+      district: 'Yavatmal',
+      state: 'Maharashtra',
+      crops: ['Cotton', 'Soybean'],
+      language: 'en',
     );
     await auth.completeOnboarding(user);
     if (context.mounted) context.go('/');

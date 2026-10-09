@@ -90,10 +90,10 @@ class AdvisoryProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         _currentAdvisory = AdvisoryData.fromJson(jsonDecode(response.body));
       } else {
-        _error = response.statusCode == 503 ? 'यह डेमो है। वास्तविक फसल सलाह के लिए प्रशिक्षित मॉडल और डेटा अभी उपलब्ध नहीं हैं।' : 'सलाह प्राप्त करने में विफल: ${response.statusCode}';
+        _error = response.statusCode == 503 ? 'This is a demo. Trained models and data for real crop advice are not yet available.' : 'Unable to retrieve advisory: ${response.statusCode}';
       }
     } catch (e) {
-      _error = 'नेटवर्क त्रुटि: ${e.toString()}';
+      _error = 'Network error: ${e.toString()}';
     } finally {
       _isLoading = false;
       notifyListeners();
