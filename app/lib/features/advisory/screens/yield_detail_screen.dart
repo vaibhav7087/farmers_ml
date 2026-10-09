@@ -3,17 +3,22 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme.dart';
 import '../../../core/router.dart';
 
-class YieldDetailScreen extends StatelessWidget {
+class YieldDetailScreen extends StatefulWidget {
   final String district;
   final String crop;
 
   const YieldDetailScreen({super.key, required this.district, required this.crop});
 
   @override
+  State<YieldDetailScreen> createState() => _YieldDetailScreenState();
+}
+
+class _YieldDetailScreenState extends State<YieldDetailScreen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('$crop Yield details - $district'),
+        title: Text('${widget.crop} Yield details - ${widget.district}'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

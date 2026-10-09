@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../core/theme.dart';
 
-class PriceDetailScreen extends StatelessWidget {
+class PriceDetailScreen extends StatefulWidget {
   final String mandi;
   final String crop;
   final String? variety;
@@ -10,10 +10,15 @@ class PriceDetailScreen extends StatelessWidget {
   const PriceDetailScreen({super.key, required this.mandi, required this.crop, this.variety});
 
   @override
+  State<PriceDetailScreen> createState() => _PriceDetailScreenState();
+}
+
+class _PriceDetailScreenState extends State<PriceDetailScreen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('$crop Price details - $mandi'),
+        title: Text('${widget.crop} Price details - ${widget.mandi}'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

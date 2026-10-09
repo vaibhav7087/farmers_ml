@@ -35,11 +35,19 @@ const PRICE_MODELS: Record<string, string> = {
 
 export const pricePredictor = {
   async predict(env: Env, input: PriceInput): Promise<PriceOutput> {
-    const [currentPrice, historicalPrices, policyEvents] = await Promise.all([
-      getCurrentPrice(env, input.mandi, input.crop, input.variety),
-      getHistoricalPrices(env, input.mandi, input.crop, input.variety, 104),
-      input.include_policy ? getPolicyEvents(env, input.crop) : Promise.resolve([]),
-    ]);
+    let currentPrice: number | null = null;
+    let historicalPrices: number[] = [];
+    let policyEvents: string[] = [];
+    try {
+      [currentPrice, historicalPrices, policyEvents] = await Promise.all([
+        getCurrentPrice(env, input.mandi, input.crop, input.variety),
+        getHistoricalPrices(env, input.mandi, input.crop, input.variety, 104),
+        input.include_policy ? getPolicyEvents(env, input.crop) : Promise.resolve([]),
+      ]);
+    } catch (error) {
+      console.warn('Price data query failed, using fallback:', error);
+      return fallbackPrice(null, []);
+    }
 
     if (!currentPrice || historicalPrices.length < 12) {
       return fallbackPrice(currentPrice || 5000, policyEvents);

@@ -78,7 +78,7 @@ class AppTheme {
         labelStyle: GoogleFonts.notoSansDevanagari(color: Colors.grey[600]),
         hintStyle: GoogleFonts.notoSansDevanagari(color: Colors.grey[400]),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: surfaceLight,
@@ -157,7 +157,7 @@ class AppTheme {
           borderSide: const BorderSide(color: primaryLightGreen, width: 2),
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         color: surfaceDark,

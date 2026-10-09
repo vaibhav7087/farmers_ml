@@ -1,6 +1,6 @@
 # Render deployment
 
-The repository is cloned at D:\farmers_ml. Deployment fixes are on codex/render-deployment.
+The repository is cloned at D:\farmers_ml. The current master branch includes deployment fixes and the dashboard update.
 
 ## Quick deployment
 
@@ -23,13 +23,11 @@ Alternatively create Key Value first (Free, Singapore, eviction policy noevictio
 
 ## Current project limitations
 
-This deploys the Render backend API, not the Flutter frontend or Cloudflare Workers.
-The frontend still requires its own build/deployment and API integration.
-The backend contains placeholder training data, simulated inference and fixed satellite indices.
+The public website serves the interactive dashboard in demo/, added by commit 18af535.
+The Flutter application remains available in app/ as source code.
+Dashboard scenarios, alerts and chart values are samples, not live predictions.
+The Render backend contains placeholder training data, simulated inference and fixed satellite indices.
 Successful health checks demonstrate server/queue availability, not ML correctness.
-Free services have hosting and persistence limits. Do not rely on free Redis for durable job storage.
-Public-repository deployments without the GitHub integration do not automatically deploy new commits.
-For automatic deployment, configure Render's GitHub integration for this repository; repository-owner approval may be needed.
 
 ## Local validation
 
@@ -41,9 +39,12 @@ npm test
 To run locally, set REDIS_URL to a local Redis URL, then npm start.
 
 
-## Farmer app website
+## Dashboard website
 
-The Blueprint also publishes the Flutter app as a free static website. It uses Flutter 3.27.4 and the backend API at https://kisaan-ml-render.onrender.com/api/v1.
-Local Flutter SDK: D:\farmers_ml\.tools\flutter\bin\flutter.bat
-Build locally from app: ..\.tools\flutter\bin\flutter.bat build web --release
-The mobile app's existing demo login and sample chart/market values remain demonstration features. Real advisory is unavailable until models and training data are integrated.
+Website: https://kisaan-ml-app.onrender.com
+Backend: https://kisaan-ml-render.onrender.com
+Both Render services track master. The static site uses root directory demo, build command node --check dashboard.js and publish directory .
+Future pushes to master automatically update the deployed dashboard.
+Local clone: D:\farmers_ml
+Local dashboard: node app/serve-local.cjs demo (http://localhost:3000)
+Flutter SDK: D:\farmers_ml\.tools\flutter\bin\flutter.bat
