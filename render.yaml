@@ -32,7 +32,7 @@ services:
     runtime: static
     branch: master
     rootDir: demo
-    buildCommand: node --check dashboard.js
+    buildCommand: npm test
     staticPublishPath: .
     routes:
       - type: rewrite

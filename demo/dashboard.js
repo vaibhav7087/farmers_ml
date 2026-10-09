@@ -1,250 +1,185 @@
-    let priceChart = null;
-    let currentLang = 'en';
+import { CROPS, DEMO_LOGIN, seedFarmer, emptyFarmer, revenue, analyzeField, exampleForecast, exampleClimate } from './model.js';
 
-    const translations = {
-      en: {
-        heroTitle: "Real-Time Farmer Intelligence & Mandi Forecast",
-        heroSubtitle: "Multi-modal fusion of Sentinel-2 satellite STAC, IMD gridded weather, & AgMarkNet mandi prices",
-        yieldTitle: "Yield Forecast",
-        priceTitle: "14-Day Mandi Price Prediction",
-        pestTitle: "Pest & Disease Outbreak Surveillance",
-        satelliteTitle: "Sentinel-2 & Soil Health Card Fusion",
-        runBtn: "⚡ Run Advisory",
-        currPrice: "Current Spot Price:",
-        projPrice: "14-Day Forecast:"
-      },
-      hi: {
-        heroTitle: "किसान एआई सलाहकार एवं मंडी मूल्य पूर्वानुमान",
-        heroSubtitle: "सेंटिनल-2 उपग्रह, मौसम विभाग (IMD) और एगमार्कनेट मंडी डेटा का बहुआयामी विश्लेषण",
-        yieldTitle: "उपज पूर्वानुमान",
-        priceTitle: "14-दिवसीय मंडी भाव पूर्वानुमान",
-        pestTitle: "कीट एवं रोग प्रकोप निगरानी",
-        satelliteTitle: "उपग्रह एवं मृदा स्वास्थ्य कार्ड संलयन",
-        runBtn: "⚡ सलाह प्राप्त करें",
-        currPrice: "वर्तमान मंडी भाव:",
-        projPrice: "14-दिन का अनुमान:"
-      },
-      mr: {
-        heroTitle: "शेतकरी एआय सल्लागार आणि बाजारभाव अंदाज",
-        heroSubtitle: "सेंटिनेल-२ उपग्रह, हवामान विभाग आणि ॲगमार्कनेट बाजारभाव आकडेवारीचे एकत्रीकरण",
-        yieldTitle: "उत्पादन अंदाज",
-        priceTitle: "१४-दिवसीय बाजारभाव अंदाज",
-        pestTitle: "कीड व रोग प्रादुर्भाव इशारा",
-        satelliteTitle: "उपग्रह व मृदा आरोग्य पत्रिका विश्लेषण",
-        runBtn: "⚡ सल्ला मिळवा",
-        currPrice: "आजचा बाजारभाव:",
-        projPrice: "१४ दिवसांचा अंदाज:"
-      }
-    };
+const app = document.getElementById('app');
+const STORE = 'kisaan-farmer-workspace-v1', SESSION = 'kisaan-demo-session';
+let profiles = [], farmer = null, loginTab = 'login', result = null, weatherField = '', historyTab = 'harvests';
+try { const saved = JSON.parse(localStorage.getItem(STORE) || 'null'); profiles = Array.isArray(saved) && saved.length ? saved : [seedFarmer()]; } catch (_) { profiles = [seedFarmer()]; }
+try { farmer = profiles.find(p => p.id === sessionStorage.getItem(SESSION)) || null; } catch (_) {}
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const num = (value, digits = 0) => Number(value || 0).toLocaleString('en-IN', { maximumFractionDigits: digits });
+const inr = value => '₹' + num(value);
+const shortDate = value => new Date(value.length === 10 ? value + 'T12:00:00' : value).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+const initials = name => name.split(' ').filter(Boolean).slice(0, 2).map(s => s[0]).join('').toUpperCase();
+const cropOptions = selected => Object.entries(CROPS).map(([id, c]) => `<option value="${id}" ${id === selected ? 'selected' : ''}>${c.name}</option>`).join('');
+const fieldName = id => farmer.fields.find(f => f.id === id)?.name || 'Archived field';
+const paths = {
+  leaf: '<path d="M20 4C12 3 4 6 4 12a6 6 0 0 0 6 6c6 0 9-6 10-14Z"/><path d="M4 21 15 10"/>',
+  home: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+  field: '<path d="m3 8 9-5 9 5v10l-9 4-9-4Z"/><path d="m3 8 9 5 9-5M12 13v9m-5-12v10m10-10v10"/>',
+  planner: '<path d="M4 21 4 12m6 9V7m6 14V3m5 18H2"/><path d="m3 8 5-4 5 2 8-5"/>',
+  weather: '<circle cx="9" cy="8" r="4"/><path d="M9 1V0m-6 3L1 1m0 7H0m14-5 2-2m0 7h2M4 18a4 4 0 0 1 2-7 5 5 0 0 1 9 1 3 3 0 1 1 2 6Z"/>',
+  history: '<path d="M3 8a9 9 0 1 1-1 8M3 3v5h5"/><path d="M12 7v5l3 2"/>',
+  rupee: '<path d="M5 4h14M5 8h14M6 4c8 0 8 8 0 8l9 9"/>',
+  user: '<circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/>',
+  arrow: '<path d="M4 12h16m-6-6 6 6-6 6"/>',
+  plus: '<path d="M12 4v16M4 12h16"/>',
+  pin: '<path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/>',
+  logout: '<path d="M9 3H4v18h5m5-14 5 5-5 5m-5-5h12"/>',
+  check: '<path d="m5 12 4 4L20 5"/>',
+  edit: '<path d="m15 4 5 5m-15 9 3-7L18 1l5 5-11 11-7 1Zm-2 5h18"/>',
+  rain: '<path d="M5 13a4 4 0 0 1 0-8 6 6 0 0 1 11 1 4 4 0 1 1 2 7ZM7 17l-1 3m6-3-1 3m6-3-1 3"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-11v1"/>',
+  grain: '<path d="M12 22V2m0 6c-5 0-7-2-7-5 4 0 7 2 7 5Zm0 5c-5 0-7-2-7-5 4 0 7 2 7 5Zm0 5c-5 0-7-2-7-5 4 0 7 2 7 5Zm0-10c5 0 7-2 7-5-4 0-7 2-7 5Zm0 5c5 0 7-2 7-5-4 0-7 2-7 5Zm0 5c5 0 7-2 7-5-4 0-7 2-7 5Z"/>'
+};
+function icon(name) { return `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">${paths[name] || paths.leaf}</svg>`; }
+function brand() { return `<span class="brand"><span class="brand-mark">${icon('leaf')}</span><span>kisaan<small>GROW WITH CONFIDENCE</small></span></span>`; }
+function plotArt(color = '#91a56f', large = false) {
+  return `<svg viewBox="0 0 450 220" preserveAspectRatio="${large ? 'xMidYMid meet' : 'xMidYMid slice'}" aria-hidden="true"><path fill="#bdcf9d" d="M0 0h450v220H0z"/><path fill="${color}" d="m-10 62 185-46 215 88-220 120-180-31Z"/><path fill="#718954" d="m160-15 115 27 202 94-80 72L180 64Z"/><path fill="#d3c982" d="m-20 151 98-29 131 85-43 47H-20Z"/><path fill="#a6b781" d="m253 142 162-65 60 43v120H312Z"/><g fill="none" stroke="#e8e8b0" stroke-width="3" opacity=".5"><path d="m2 82 181-46 188 78M-5 97l182-45 187 77M-9 113l180-42 181 73M-12 131l179-42 164 70M-5 146l167-40 150 68M9 165l148-41 138 64M30 181l120-35 118 56"/></g><path fill="none" stroke="#ebdfb5" stroke-width="9" d="m98-15 115 89 25 62 98 98"/><path fill="none" stroke="#677e55" stroke-width="2" stroke-dasharray="6 5" d="m16 72 156-39 166 74-146 98L18 163Z"/><g fill="#4f6a44"><circle cx="340" cy="53" r="12"/><circle cx="363" cy="64" r="10"/><circle cx="385" cy="79" r="12"/><circle cx="79" cy="63" r="9"/><circle cx="66" cy="71" r="10"/></g><rect x="275" y="47" width="25" height="21" rx="3" fill="#e9e4cb"/><path d="m271 48 16-12 17 12" fill="#8f7854"/></svg>`;
+}
+function persist() {
+  try { localStorage.setItem(STORE, JSON.stringify(profiles)); return true; }
+  catch (_) { toast('Browser storage is full or unavailable. Your latest changes could not be saved.'); return false; }
+}
+function toast(message) {
+  document.querySelector('.toast')?.remove();
+  const el = document.createElement('div'); el.className = 'toast'; el.setAttribute('role', 'status'); el.textContent = message; document.body.append(el); setTimeout(() => el.remove(), 4000);
+}
+function page() { const route = location.hash.slice(1); return ['overview', 'fields', 'planner', 'weather', 'history', 'revenue', 'profile'].includes(route) ? route : 'overview'; }
+function navItems(mobile = false) {
+  const items = [['overview', 'home', 'Overview'], ['fields', 'field', 'My fields'], ['planner', 'planner', 'Crop planner'], ['weather', 'weather', 'Weather'], ['history', 'history', 'Farm history'], ['revenue', 'rupee', 'Revenue'], ['profile', 'user', 'My profile']];
+  return items.map(([id, glyph, label]) => `<a class="${mobile ? '' : 'nav-item'} ${page() === id ? 'active' : ''}" href="#${id}" ${page() === id ? 'aria-current="page"' : ''}>${icon(glyph)}<span>${mobile ? ({ overview: 'Home', fields: 'Fields', planner: 'Planner', history: 'History', weather: 'Weather', revenue: 'Revenue', profile: 'Profile' }[id]) : label}</span>${!mobile && id === 'fields' ? `<span class="nav-count">${farmer.fields.length}</span>` : ''}</a>`).join('');
+}
+function head(title, description, action = '', eyebrow = 'YOUR FARM WORKSPACE') { return `<div class="page-head"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1><p>${description}</p></div>${action}</div>`; }
+function empty(title, message, action = '') { return `<div class="empty">${icon('field')}<h3>${title}</h3><p>${message}</p>${action}</div>`; }
+function metric(label, value, foot, glyph, tag = '') { return `<div class="card"><div class="metric-top"><div class="metric-icon">${icon(glyph)}</div>${tag ? `<span class="badge gray">${tag}</span>` : ''}</div><div class="metric-label">${label}</div><div class="metric-value">${value}</div><div class="metric-foot">${foot}</div></div>`; }
+function loginView() {
+  return `<main class="login"><section class="login-story">${brand()}<div><div class="eyebrow" style="color:#afc894">A LITTLE INSIGHT. A BETTER HARVEST.</div><h1>Your farm.<br>Your future.<br><em>Grow it smarter.</em></h1><p>Know your land, plan your next crop, and make more of every harvest.</p><div class="landscape">${plotArt('#93af67', true)}</div></div><div class="story-bottom">Built for the farmer. From the first seed to the final sale.</div></section><section class="login-body"><div class="login-panel"><span class="badge">INTERACTIVE FRONTEND DEMO</span><h1>${loginTab === 'login' ? 'Welcome back, farmer.' : 'Let’s set up your farm.'}</h1><p class="muted small">${loginTab === 'login' ? 'A clearer picture of your farm starts here.' : 'Create a browser-saved demo profile to try your own fields.'}</p><div class="tabs"><button data-action="login-tab" data-tab="login" class="${loginTab === 'login' ? 'active' : ''}">Sign in</button><button data-action="login-tab" data-tab="create" class="${loginTab === 'create' ? 'active' : ''}">Create demo profile</button></div>${loginTab === 'login' ? `<form id="login-form"><div class="field"><label for="email">Email address</label><input id="email" name="email" type="email" placeholder="farmer@kisaan.demo" autocomplete="username" required></div><div class="field"><label for="password">Demo password</label><input id="password" name="password" type="password" placeholder="Enter the demo password" autocomplete="current-password" required></div><button class="btn wide" type="submit">Sign in to your farm ${icon('arrow')}</button><p class="error" id="login-error" role="alert"></p></form><div class="login-divider">or explore right away</div><button class="btn soft wide" data-action="demo-login">${icon('leaf')} Try the populated demo farm</button><div class="hint"><strong>Demo account</strong><br>${DEMO_LOGIN.email}<br>Password: <strong>${DEMO_LOGIN.password}</strong></div>` : `<form id="create-profile-form"><div class="field"><label for="new-name">Your name</label><input id="new-name" name="name" placeholder="e.g. Asha Deshmukh" maxlength="60" required></div><div class="field"><label for="new-email">Demo email</label><input id="new-email" name="email" type="email" placeholder="asha@example.com" maxlength="100" required></div><div class="field"><label for="new-village">Village / district</label><input id="new-village" name="village" placeholder="e.g. Nagpur, Maharashtra" maxlength="100" required></div><button class="btn wide" type="submit">Create demo workspace ${icon('arrow')}</button><p class="error" id="login-error" role="alert"></p><div class="hint">This creates a local demo profile. To return later, use this email and the shared demo password <strong>${DEMO_LOGIN.password}</strong>.</div></form>`}<footer>Prototype sign-in only. Use fictional details and the shared demo password, never a real password. Profiles and records stay in this browser; no secure server account is created.</footer></div></section></main>`;
+}
+function forecastView() { return `<div class="forecast">${exampleForecast().map(d => `<div class="forecast-day"><div>${d.label}</div><div class="weather-icon">${d.icon}</div><strong>${d.high}° <span class="muted small">${d.low}°</span></strong><small>${d.rain} mm</small></div>`).join('')}</div>`; }
+function fieldCard(f) {
+  const crop = CROPS[f.crop] || CROPS.cotton;
+  return `<article class="card field-card"><div class="field-image">${plotArt(crop.color)}<span class="badge">${crop.emoji} ${crop.name}</span><span class="area-badge">${num(f.area, 2)} ha</span></div><div class="field-info"><div class="row between"><h3>${esc(f.name)}</h3><button class="text-btn" data-action="edit-field" data-id="${esc(f.id)}" aria-label="Edit ${esc(f.name)}">${icon('edit')}</button></div><p class="row">${icon('pin')}${esc(f.location)}</p><div class="field-meta"><span>${esc(f.irrigation)}</span><strong>${esc(f.status)}</strong></div><div class="section-footer"><span>Illustrative map</span><button class="text-btn" data-action="plan-field" data-id="${esc(f.id)}">Plan this field ${icon('arrow')}</button></div></div></article>`;
+}
+function adviceItem(a) { return `<div class="advice-item"><span class="advice-marker">${icon(a.state === 'Applied' ? 'check' : 'leaf')}</span><div><h4>${esc(a.title)}</h4><p>${esc(a.text)}</p><span class="badge ${a.state === 'Applied' ? '' : 'amber'}">${esc(a.state)}</span></div></div>`; }
+function overviewView() {
+  const totalArea = farmer.fields.reduce((s, f) => s + Number(f.area), 0);
+  const records = farmer.harvests.filter(h => h.season.includes('2025'));
+  const totalKg = records.reduce((s, h) => s + h.kg, 0), gross = records.reduce((s, h) => s + h.kg / 100 * h.price, 0);
+  return `${head(`Hello, ${esc(farmer.name.split(' ')[0])}. <span style="font-size:24px">☀</span>`, 'Here’s a fresh look at your farm, all in one place.', `<a href="#planner" class="btn">${icon('plus')} Plan a crop</a>`)}<section class="hero"><div><div class="eyebrow">GOOD PLANS GROW BETTER HARVESTS</div><h2>A little insight today.<br>A better harvest tomorrow.</h2><p>Explore what your land can grow. Compare weather, estimate your harvest, and plan with confidence.</p><a class="btn lime" href="#planner">Explore crop planner ${icon('arrow')}</a></div><div class="hero-art">${plotArt('#8da864', true)}<div class="hero-chip">Your farm at a glance<strong>${num(totalArea, 2)} hectares · ${farmer.fields.length} fields</strong></div></div></section><div class="metrics">${metric('Total farm area', `${num(totalArea, 2)} <small>ha</small>`, `${farmer.fields.length} fields in your workspace`, 'field')}${metric('Recorded production', `${num(totalKg / 1000, 2)} <small>tonnes</small>`, '2025 sample harvest records', 'grain', '2025')}${metric('Recorded gross sales', inr(gross), 'Based on sample sale prices', 'rupee', 'Sample')}${metric('Plans to explore', farmer.plans.length, 'Saved crop planning scenarios', 'planner')}</div><div class="section-head"><h2>Your fields</h2><a class="text-btn" href="#fields">View all fields ${icon('arrow')}</a></div>${farmer.fields.length ? `<div class="grid3">${farmer.fields.slice(0, 3).map(fieldCard).join('')}</div>` : `<div class="card">${empty('Your first field starts here', 'Add its area, crop and location to start planning.', '<button class="btn" data-action="add-field">Add a field</button>')}</div>`}<div class="dashboard-lower"><section class="card"><div class="card-head"><div><h2>A week on your farm</h2><p>${esc(farmer.village)} · Weather example</p></div><span class="badge gray">SAMPLE DATA</span></div>${forecastView()}<div class="weather-stats"><div>Average high<strong>30°C</strong></div><div>Rain in 7 days<strong>34 mm</strong></div><div>Humidity example<strong>68%</strong></div></div><div class="section-footer"><span>Illustrative forecast; no live weather connected</span><a class="text-btn" href="#weather">Weather outlook ${icon('arrow')}</a></div></section><section class="card"><div class="card-head"><div><h2>A little guidance</h2><p>Small steps to care for your next harvest</p></div>${icon('leaf')}</div>${farmer.advice.length ? farmer.advice.slice().reverse().slice(0, 2).map(adviceItem).join('') : '<p class="muted small">Run the planner to explore crop care suggestions.</p>'}<div class="section-footer"><span>Example advice from your demo history</span><a class="text-btn" href="#history">View history ${icon('arrow')}</a></div></section></div>`;
+}
+function fieldsView() { return `${head('Good things grow here.', 'Manage your fields, their location, and what you’re growing.', `<button class="btn" data-action="add-field">${icon('plus')} Add field</button>`, 'MY FIELDS')}<div class="hint" style="margin-bottom:23px">Field sketches are illustrative, not satellite imagery. Demo farm locations and records are fictional.</div>${farmer.fields.length ? `<div class="grid3">${farmer.fields.map(fieldCard).join('')}</div>` : `<div class="card">${empty('No fields added yet', 'Start with the land you want to plan for.', '<button class="btn" data-action="add-field">Add your first field</button>')}</div>`}`; }
+function inputField(name, label, value, attrs = '', help = '') { return `<div class="field"><label for="${name}">${label}</label><input id="${name}" name="${name}" value="${esc(value)}" ${attrs}>${help ? `<small>${help}</small>` : ''}</div>`; }
+let plannerField = '';
+function plannerView() {
+  const f = farmer.fields.find(f => f.id === plannerField) || farmer.fields[0], crop = f?.crop || 'cotton', c = CROPS[crop];
+  return `${head('What will your land grow?', 'Explore crop fit, potential harvest, and the value of your produce.', '<span class="badge amber">SCENARIO PLANNER</span>', 'CROP PLANNER')}<div class="planner-layout"><section class="card planner-form"><form id="planner-form"><h3>1. Start with your field</h3><div class="form-grid"><div class="field span2"><label for="plan-field">Choose a saved field</label><select id="plan-field" name="field" data-change="plan-field"><option value="">Enter field details manually</option>${farmer.fields.map(field => `<option value="${esc(field.id)}" ${field.id === f?.id ? 'selected' : ''}>${esc(field.name)} · ${num(field.area, 2)} ha</option>`).join('')}</select></div>${inputField('area', 'Land area', f?.area || 2, 'type="number" min="0.01" max="100000" step="0.01" required')}<div class="field"><label for="unit">Area unit</label><select id="unit" name="unit"><option value="ha">Hectares</option><option value="acre">Acres</option></select></div>${inputField('lat', 'Latitude', f?.lat ?? 20.3899, 'type="number" min="-90" max="90" step="any" required')}${inputField('lon', 'Longitude', f?.lon ?? 78.1307, 'type="number" min="-180" max="180" step="any" required')}</div><h3>2. Choose what to grow</h3><div class="form-grid"><div class="field"><label for="crop">Crop</label><select id="crop" name="crop" data-change="plan-crop">${cropOptions(crop)}</select></div>${inputField('sowing', 'Planned sowing date', '2027-06-15', 'type="date" required')}${inputField('baseline', 'Reference yield (kg/ha)', c.baseline, 'type="number" min="1" max="100000" step="any" required', 'Editable sample reference; replace with your own farm history.')}${inputField('water', 'Planned irrigation (mm / season)', f?.irrigation === 'Rainfed' ? 0 : 200, 'type="number" min="0" max="5000" required', 'This is a demo water input, not an irrigation prescription.')}</div><h3>3. Understand the economics</h3><div class="form-grid">${inputField('price', 'Assumed sale price (₹/quintal)', c.price, 'type="number" min="0" max="1000000" required', 'Your assumption, not a live mandi quote.')}${inputField('cost', 'Total cultivation cost (₹)', 120000, 'type="number" min="0" max="1000000000" required', 'For this whole field, not per hectare.')}</div><div class="hint amber" style="margin-top:20px">This demo uses seeded climate examples and a simple formula. Coordinates are saved as field details but do not fetch location-specific weather yet.</div><p id="planner-error" class="error" role="alert"></p><button class="btn wide" type="submit" style="margin-top:20px">${icon('planner')} Analyze this field</button></form></section><section id="planner-result">${result ? resultView(result) : `<div class="card planner-placeholder">${icon('planner')}<h2>A clearer picture of your next season.</h2><p>Enter your area, location and crop to explore a yield range, expected revenue and practical care steps.</p><span class="badge gray">ILLUSTRATIVE · NOT A TRAINED ML MODEL</span></div>`}</section></div>${farmer.plans.length ? `<section class="card" style="margin-top:23px"><div class="card-head"><div><h2>Your saved plans</h2><p>Keep scenarios to compare your next season</p></div><span class="badge gray">${farmer.plans.length} saved</span></div>${farmer.plans.slice().reverse().slice(0, 5).map(p => `<div class="saved-plan"><div><h4>${esc(p.cropName)} · ${num(p.areaHa, 2)} ha</h4><p>${shortDate(p.createdAt)} · ${esc(p.fit)}</p></div><div style="text-align:right"><strong class="small">${num(p.totalKg)} kg</strong><p>${inr(p.gross)} assumed gross sales</p></div></div>`).join('')}</section>` : ''}`;
+}
+function resultView(r) {
+  return `<div class="card"><div class="result-top"><div class="eyebrow">${esc(r.cropName)} · ${num(r.areaHa, 2)} HECTARES</div><h2>${esc(r.fit)}</h2><p>Based on seeded climate examples and your inputs</p></div><div class="row between"><h3>Your harvest scenario</h3><span class="badge gray">EXAMPLE ESTIMATE</span></div><div class="result-metrics"><div><div class="metric-label">Total production</div><div class="metric-value">${num(r.totalKg)} <small>kg</small></div><div class="metric-foot">${num(r.perHa)} kg per hectare</div></div><div><div class="metric-label">Assumed gross sales</div><div class="metric-value">${inr(r.gross)}</div><div class="metric-foot">${inr(r.price)} per quintal</div></div><div><div class="metric-label">After entered costs</div><div class="metric-value">${inr(r.net)}</div><div class="metric-foot">Other charges not included</div></div><div><div class="metric-label">Illustrative harvest date</div><div class="metric-value" style="font-size:17px">${shortDate(r.harvestDate)}</div><div class="metric-foot">${CROPS[r.crop].days}-day demo crop cycle</div></div></div><div class="divider"></div><h3>Explore a wider range</h3><div class="range-track"></div><div class="range-labels"><span>${num(r.lowKg)} kg</span><span>${num(r.highKg)} kg</span></div><p class="safety-note">±25% sensitivity scenario, not a statistical confidence interval. Revenue range: ${inr(r.lowRevenue)}–${inr(r.highRevenue)} before costs.</p><div class="divider"></div><h3>Conditions to keep in mind</h3><ul class="result-steps">${r.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ul><div class="hint small"><strong>How this is calculated</strong><br>Reference yield × ${num(r.factor * 100)}% demo climate factor × land area. The lower of temperature and water factors is used. Soil, variety and pest effects are not modeled.</div><button class="btn soft wide" data-action="save-plan" style="margin-top:18px">${icon('plus')} Save to my farm history</button></div>`;
+}
+function weatherView() {
+  const f = farmer.fields.find(f => f.id === weatherField) || farmer.fields[0], crop = f?.crop || 'cotton', c = CROPS[crop], climate = exampleClimate(crop, crop === 'wheat' ? 11 : 6);
+  const waterBars = climate.seasons.map((s, i) => `<div class="production-bar"><strong>${s.rain} mm</strong><i style="height:${s.rain / Math.max(...climate.seasons.map(s => s.rain)) * 115}px;background:${i === 2 ? '#397055' : '#b1c696'}"></i></div>`).join('');
+  return `${head('A little foresight for your field.', 'Explore the week ahead and compare crop growing conditions.', '<span class="badge amber">EXAMPLE WEATHER</span>', 'WEATHER & CROP CONDITIONS')}<div class="location-strip">${icon('pin')}<select aria-label="Weather field" data-change="weather-field">${farmer.fields.length ? farmer.fields.map(field => `<option value="${esc(field.id)}" ${field.id === f?.id ? 'selected' : ''}>${esc(field.name)} · ${esc(field.location)}</option>`).join('') : '<option>Your demo location</option>'}</select><span class="coordinates">${num(f?.lat || 20.3899, 4)}° N · ${num(f?.lon || 78.1307, 4)}° E</span></div><div class="grid2"><div class="stack"><section class="weather-hero"><div><span class="badge gray">SEEDED WEATHER EXAMPLE</span><h1>30°<span style="font-size:20px;font-weight:400">C</span></h1><h3>Partly cloudy</h3><p>${esc(f?.location || farmer.village)} · Illustrative conditions</p></div><div class="big-sun">☀</div></section><section class="card"><div class="card-head"><div><h2>Your seven-day outlook</h2><p>Example weather for a presentation</p></div>${icon('weather')}</div>${forecastView()}<div class="section-footer"><span>Forecast values are sample data</span><span class="badge gray">NOT LIVE</span></div></section></div><section class="card"><div class="card-head"><div><h2>A look at past seasons</h2><p>Seeded climate history · ${c.season} example</p></div><span class="badge gray">3 SEASONS</span></div><div class="grid2"><div><div class="metric-label">Average seasonal rain</div><div class="metric-value">${num(climate.rain)} <small>mm</small></div></div><div><div class="metric-label">Average temperature</div><div class="metric-value">${num(climate.temp, 1)}<small>°C</small></div></div></div><div class="production-chart">${waterBars}</div><div class="production-legend">${climate.seasons.map(s => `<span>${s.year}</span>`).join('')}</div><div class="hint" style="margin-top:24px">These are fictional historical inputs for the demo. A later backend integration will fetch reanalysis weather for your actual coordinates and season.</div><p class="safety-note">Weather varies across growth stages. Rainfall totals alone do not determine crop suitability or irrigation requirements.</p></section></div><div class="section-head" style="margin-top:28px"><h2>What each crop needs</h2><span class="badge gray">GENERAL PLANNING GUIDE</span></div><div class="crop-guide">${Object.entries(CROPS).map(([id, crop]) => `<article class="card guide-card"><span class="crop-emoji">${crop.emoji}</span><h3>${crop.name}</h3><span class="muted small">${crop.season} · illustrative crop profile</span><div class="guide-line"><span>Temperature band*</span><strong>${crop.temp[0]}–${crop.temp[1]}°C</strong></div><div class="guide-line"><span>Seasonal water**</span><strong>${crop.water[0]}–${crop.water[1]} mm</strong></div><div class="guide-line"><span>Demo crop cycle</span><strong>${crop.days} days</strong></div><p>${crop.care}</p><button class="text-btn" data-action="plan-crop" data-crop="${id}">Explore this crop ${icon('arrow')}</button></article>`).join('')}</div><p class="safety-note">* Illustrative temperature bands and crop cycles are demo screening parameters, not variety-specific recommendations. ** Seasonal water ranges are general <a href="https://www.fao.org/4/s2022e/s2022e02.htm" target="_blank" rel="noopener">FAO crop water guides</a>; rainfall is not the same as effective crop water supply.</p>`;
+}
+function harvestTable(records) {
+  return `<div class="table-wrap"><table><thead><tr><th>Crop / season</th><th>Field</th><th>Harvest</th><th>Yield / ha</th><th>Gross sales</th><th>Record</th></tr></thead><tbody>${records.map(h => `<tr><td><span class="crop-label"><span class="crop-emoji">${CROPS[h.crop].emoji}</span>${CROPS[h.crop].name}</span><small>${esc(h.season)}</small></td><td>${esc(fieldName(h.field))}<small>${num(h.area, 2)} ha</small></td><td><strong>${num(h.kg)} kg</strong><small>${shortDate(h.date)}</small></td><td>${num(h.kg / h.area)} kg</td><td><strong>${inr(h.kg / 100 * h.price)}</strong><small>${inr(h.price)} / quintal</small></td><td><span class="badge ${h.sample ? 'gray' : ''}">${h.sample ? 'Sample' : 'Entered'}</span></td></tr>`).join('')}</tbody></table></div>`;
+}
+function historyView() {
+  return `${head('Every season tells a story.', 'Track what you harvested and the changes you tried along the way.', `<button class="btn" data-action="add-harvest">${icon('plus')} Record harvest</button>`, 'FARM HISTORY')}<div class="tabs" style="max-width:450px"><button data-action="history-tab" data-tab="harvests" class="${historyTab === 'harvests' ? 'active' : ''}">Harvest records</button><button data-action="history-tab" data-tab="advice" class="${historyTab === 'advice' ? 'active' : ''}">Advice & changes</button><button data-action="history-tab" data-tab="plans" class="${historyTab === 'plans' ? 'active' : ''}">Saved plans</button></div>${historyTab === 'harvests' ? `<section class="card"><div class="card-head"><div><h2>Your harvest journal</h2><p>Production and assumed sales across your seasons</p></div><span class="badge gray">${farmer.harvests.length} RECORDS</span></div>${farmer.harvests.length ? harvestTable(farmer.harvests) : empty('Your harvest journal is empty', 'Record a crop, quantity and season to begin tracking.', '<button class="btn" data-action="add-harvest">Record harvest</button>')}<p class="safety-note">Preloaded records are fictional. Entered records are stored locally in this browser. Gross sales exclude costs and fees.</p></section>` : historyTab === 'advice' ? `${farmer.advice.length ? farmer.advice.slice().reverse().map(a => `<article class="card history-card"><div class="card-head"><div class="row"><span class="crop-emoji">${CROPS[a.crop].emoji}</span><div><h3>${esc(a.title)}</h3><p>${CROPS[a.crop].name} · ${shortDate(a.date)}</p></div></div><span class="badge ${a.state === 'Applied' ? '' : 'amber'}">${esc(a.state)}</span></div><p>${esc(a.text)}</p><div class="history-result"><strong>${esc(a.action)}</strong>${esc(a.outcome)}</div><div class="section-footer"><span>Seeded advice and outcomes · sample data</span>${a.state !== 'Applied' ? `<button class="text-btn" data-action="mark-advice" data-id="${esc(a.id)}">Mark as applied ${icon('check')}</button>` : '<span class="trend">Recorded in demo</span>'}</div></article>`).join('') : `<section class="card">${empty('No advice history yet', 'Use the planner to explore care suggestions for your crop.')}</section>`}` : `<section class="card"><div class="card-head"><h2>Scenarios you’ve saved</h2><a class="text-btn" href="#planner">New scenario ${icon('plus')}</a></div>${farmer.plans.length ? farmer.plans.slice().reverse().map(p => `<article class="saved-plan"><div><h4>${esc(p.cropName)} · ${num(p.areaHa, 2)} ha</h4><p>${shortDate(p.createdAt)} · ${esc(p.fit)}</p><p>Location recorded: ${esc(p.lat)}, ${esc(p.lon)}</p></div><div style="text-align:right"><strong>${num(p.totalKg)} kg</strong><p>${inr(p.gross)} gross</p><span class="badge gray">Scenario</span></div></article>`).join('') : empty('Your next season starts with a plan', 'Save a scenario from the crop planner to see it here.', '<a href="#planner" class="btn">Explore planner</a>')}</section>`}`;
+}
+function revenueView() {
+  return `${head('Know what your harvest is worth.', 'Turn an amount of produce into a clear sale estimate.', '<span class="badge gray">YOUR PRICE ASSUMPTION</span>', 'REVENUE CALCULATOR')}<div class="grid2"><section class="card"><form id="revenue-form"><div class="card-head"><div><h2>From grain to gross sales</h2><p>Enter the quantity and a price you want to explore</p></div>${icon('rupee')}</div><div class="form-grid"><div class="field span2"><label for="sale-crop">Crop</label><select id="sale-crop" name="crop" data-change="sale-crop">${cropOptions('cotton')}</select></div>${inputField('quantity', 'Produce quantity', 2500, 'type="number" min="0" step="any" required')}<div class="field"><label for="quantity-unit">Quantity unit</label><select name="unit" id="quantity-unit"><option value="kg">Kilograms (kg)</option><option value="quintal">Quintals (100 kg)</option><option value="tonne">Tonnes (1,000 kg)</option></select></div>${inputField('sale-price', 'Assumed price (₹/quintal)', 6200, 'type="number" min="0" step="any" required')}${inputField('sale-cost', 'Total costs and charges (₹)', 90000, 'type="number" min="0" step="any" required')}</div><div class="hint" style="margin-top:22px">Use a buyer’s quote or a price assumption. These sample prices are not live market prices.</div><p class="error" id="revenue-error" role="alert"></p><button class="btn wide" style="margin-top:22px" type="submit">Calculate sale estimate ${icon('arrow')}</button></form></section><section id="revenue-result">${saleResult(revenue(2500, 'kg', 6200, 90000), 6200, 90000)}</section></div><section class="card" style="margin-top:24px"><div class="card-head"><div><h2>Your sample sales history</h2><p>Compare the quantity and price recorded in previous seasons</p></div><a class="text-btn" href="#history">Harvest journal ${icon('arrow')}</a></div>${farmer.harvests.length ? harvestTable(farmer.harvests.slice(0, 3)) : empty('No sale records yet', 'Add a harvest record to build your sales history.')}</section>`;
+}
+function saleResult(sale, price, cost) { return `<div class="sale-result"><div class="eyebrow">YOUR SALE SCENARIO</div><h1>${inr(sale.gross)}</h1><p>Estimated gross sales for ${num(sale.kg)} kg of produce</p><div class="sale-breakdown"><div><span>Quantity in quintals</span><strong>${num(sale.quintals, 2)} q</strong></div><div><span>Assumed price / quintal</span><strong>${inr(price)}</strong></div><div><span>Total costs entered</span><strong>− ${inr(cost)}</strong></div><div><span>After entered costs</span><strong>${inr(sale.net)}</strong></div></div><p style="margin-top:18px;font-size:10px">Simple quantity × price arithmetic. This is not a market forecast or a guaranteed sale. Other fees and deductions depend on your transaction.</p></div>`; }
+function profileView() {
+  const totalArea = farmer.fields.reduce((s, f) => s + f.area, 0), crops = [...new Set(farmer.fields.map(f => f.crop))];
+  return `${head('The farmer behind the field.', 'Your farm details, produce and plans, together in one workspace.', `<button class="btn secondary" data-action="edit-profile">${icon('edit')} Edit profile</button>`, 'MY PROFILE')}<div class="profile-grid"><section class="card profile-card"><div class="avatar large">${esc(initials(farmer.name))}</div><h2>${esc(farmer.name)}</h2><p class="muted">${esc(farmer.village)}</p><span class="badge gray">DEMO PROFILE · BROWSER SAVED</span><div class="profile-details"><div><span>Email</span><strong style="font-size:11px">${esc(farmer.email)}</strong></div><div><span>Experience</span><strong>${num(farmer.experience)} years</strong></div><div><span>Farm area</span><strong>${num(totalArea, 2)} ha</strong></div><div><span>Fields</span><strong>${farmer.fields.length}</strong></div><div><span>Saved plans</span><strong>${farmer.plans.length}</strong></div></div><div class="row" style="flex-wrap:wrap">${crops.map(c => `<span class="badge">${CROPS[c].emoji} ${CROPS[c].name}</span>`).join('')}</div><button class="btn secondary wide" data-action="logout" style="margin-top:25px">${icon('logout')} Sign out of demo</button></section><div class="stack"><section class="card"><div class="card-head"><div><h2>Your land, at a glance</h2><p>Where you grow and what’s growing</p></div><a class="text-btn" href="#fields">Manage fields ${icon('arrow')}</a></div>${farmer.fields.length ? farmer.fields.map(f => `<div class="saved-plan"><div class="row"><span class="crop-emoji">${CROPS[f.crop].emoji}</span><div><h4>${esc(f.name)}</h4><p>${CROPS[f.crop].name} · ${num(f.area, 2)} ha · ${esc(f.soil)}</p><p>${esc(f.location)}</p></div></div><button class="text-btn" data-action="edit-field" data-id="${esc(f.id)}">${icon('edit')} Edit</button></div>`).join('') : empty('No fields yet', 'Add a field to make this profile your own.')}</section><section class="card"><div class="card-head"><div><h2>Produce you’ve recorded</h2><p>Sample production and your own added records</p></div>${icon('grain')}</div>${farmer.harvests.length ? Object.entries(CROPS).filter(([id]) => farmer.harvests.some(h => h.crop === id)).map(([id, c]) => `<div class="saved-plan"><div class="row"><span class="crop-emoji">${c.emoji}</span><h4>${c.name}</h4></div><strong>${num(farmer.harvests.filter(h => h.crop === id).reduce((s, h) => s + h.kg, 0))} kg</strong></div>`).join('') : empty('Your produce story is still growing', 'Record your first harvest to see it here.')}</section><div class="hint">This frontend demo stores data only in your browser. The login is a presentation flow, not secure authentication. A later backend will provide real accounts, durable storage and location-based data.</div></div></div>`;
+}
+function render() {
+  if (!farmer) { app.innerHTML = loginView(); return; }
+  const views = { overview: overviewView, fields: fieldsView, planner: plannerView, weather: weatherView, history: historyView, revenue: revenueView, profile: profileView };
+  const labels = { overview: 'Overview', fields: 'My fields', planner: 'Crop planner', weather: 'Weather', history: 'Farm history', revenue: 'Revenue', profile: 'My profile' };
+  app.innerHTML = `<div class="shell"><aside class="sidebar">${brand()}<div class="nav-caption">YOUR WORKSPACE</div><nav aria-label="Main navigation">${navItems()}</nav><div class="sidebar-foot"><div class="sidebar-note">${icon('leaf')}<div class="eyebrow">SMALL CHANGES. BETTER SEASONS.</div><p>Plan a little ahead.<br>Grow a little smarter.</p><a class="text-btn" href="#planner" style="margin-top:9px">Explore crop planner ${icon('arrow')}</a></div><div class="sidebar-user"><div class="avatar">${esc(initials(farmer.name))}</div><div><strong>${esc(farmer.name)}</strong><small>Demo farm workspace</small></div><button data-action="logout" aria-label="Sign out of demo">${icon('logout')}</button></div></div></aside><div class="workspace"><header class="topbar"><div class="breadcrumb">Your workspace <span style="padding:0 9px">/</span> <strong>${labels[page()]}</strong></div><div class="mobile-brand">${brand()}</div><div class="topbar-right"><span class="date-label">${new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}</span><span class="demo-label"><i class="status-dot"></i>Demo workspace</span><div class="avatar">${esc(initials(farmer.name))}</div></div></header><main class="content" id="main-content">${views[page()]()}<footer class="app-footer"><span>Kisaan · A little insight. A better harvest.</span><span>Sample data · Saved in this browser · <a href="#profile">Your profile</a></span></footer></main></div><nav class="mobile-nav" aria-label="Mobile navigation">${navItems(true)}</nav></div>`;
+}
 
-    const CROP_DATA = {
-      cotton: {
-        yieldKg: 1820,
-        unit: 'kg / hectare',
-        confidence: '89.4%',
-        ndvi: '0.68',
-        rain: '842 mm',
-        soil: '7.2 pH',
-        spotPrice: 7150,
-        forecastPrice: 7480,
-        change: '+4.6%',
-        prices: [7100, 7120, 7150, 7190, 7230, 7280, 7310, 7350, 7390, 7420, 7450, 7460, 7475, 7480],
-        adv: "Optimal harvest moisture. Recommendation: HOLD harvest by 7 days for peak mandi price realization.",
-        advHi: "मिट्टी में नमी अनुकूल है। अधिकतम मंडी भाव प्राप्त करने के लिए फसल को 7 दिन रोककर बेचें।",
-        advMr: "जमिनीतील ओलावा योग्य आहे. जास्तीत जास्त बाजारभाव मिळवण्यासाठी शेतमाल ७ दिवस राखून ठेवा."
-      },
-      soybean: {
-        yieldKg: 2150,
-        unit: 'kg / hectare',
-        confidence: '92.1%',
-        ndvi: '0.74',
-        rain: '910 mm',
-        soil: '6.8 pH',
-        spotPrice: 4650,
-        forecastPrice: 4890,
-        change: '+5.2%',
-        prices: [4620, 4640, 4650, 4680, 4710, 4750, 4780, 4810, 4830, 4850, 4870, 4880, 4890, 4890],
-        adv: "Strong export demand and MSP support. Sell 50% lot at ₹4,850+ target.",
-        advHi: "मजबूत निर्यात मांग और एमएसपी समर्थन। ₹4,850+ के लक्ष्य पर 50% उपज बेचें।",
-        advMr: "चांगली निर्यात मागणी आणि हमीभाव आधार. ₹४,८५०+ भावावर ५०% माल विका."
-      },
-      wheat: {
-        yieldKg: 3450,
-        unit: 'kg / hectare',
-        confidence: '94.0%',
-        ndvi: '0.81',
-        rain: '320 mm',
-        soil: '7.5 pH',
-        spotPrice: 2420,
-        forecastPrice: 2490,
-        change: '+2.9%',
-        prices: [2400, 2410, 2420, 2430, 2445, 2450, 2460, 2470, 2475, 2480, 2485, 2490, 2490, 2490],
-        adv: "Stable domestic procurement. Normal seasonal mandi trends.",
-        advHi: "स्थिर सरकारी खरीद और सामान्य मौसमी मंडी रुझान।",
-        advMr: "स्थिर शासकीय खरेदी आणि सर्वसाधारण बाजार कल."
-      },
-      tur: {
-        yieldKg: 1120,
-        unit: 'kg / hectare',
-        confidence: '86.5%',
-        ndvi: '0.62',
-        rain: '780 mm',
-        soil: '7.0 pH',
-        spotPrice: 10400,
-        forecastPrice: 10950,
-        change: '+5.3%',
-        prices: [10200, 10300, 10400, 10450, 10550, 10620, 10700, 10780, 10840, 10890, 10910, 10930, 10940, 10950],
-        adv: "Tight pulse supply buffer. High probability of crossing ₹11,000 threshold.",
-        advHi: "दालों की तंग आपूर्ति। ₹11,000 की सीमा पार करने की उच्च संभावना।",
-        advMr: "डाळींचा तुटवडा. ₹११,००० चा टप्पा ओलांडण्याची दाट शक्यता."
-      }
-    };
-
-    function initChart() {
-      if (typeof Chart === 'undefined') {
-        const message = document.createElement('p');
-        message.textContent = 'Chart could not load. The sample prices remain available below.';
-        document.getElementById('priceChart').replaceWith(message);
-        return;
-      }
-      const ctx = document.getElementById('priceChart').getContext('2d');
-      const labels = Array.from({length: 14}, (_, i) => `Day +${i + 1}`);
-
-      const gradient = ctx.createLinearGradient(0, 0, 0, 250);
-      gradient.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
-      gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
-
-      priceChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Sample mandi price scenario (₹/Qtl)',
-            data: CROP_DATA.cotton.prices,
-            borderColor: '#10b981',
-            backgroundColor: gradient,
-            borderWidth: 3,
-            fill: true,
-            tension: 0.35,
-            pointBackgroundColor: '#34d399',
-            pointRadius: 4,
-            pointHoverRadius: 7
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              labels: { color: '#9ca3af', font: { family: 'Inter', size: 12 } }
-            },
-            tooltip: {
-              backgroundColor: '#111827',
-              borderColor: 'rgba(16, 185, 129, 0.4)',
-              borderWidth: 1,
-              titleColor: '#34d399',
-              bodyColor: '#fff',
-              callbacks: {
-                label: (c) => ` Projected Price: ₹${c.parsed.y} / Quintal`
-              }
-            }
-          },
-          scales: {
-            x: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#9ca3af', font: { size: 11 } }
-            },
-            y: {
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: {
-                color: '#9ca3af',
-                callback: (val) => `₹${val}`
-              }
-            }
-          }
-        }
-      });
+function openModal(title, contents) {
+  document.querySelector('.modal-backdrop')?.remove();
+  const previousFocus = document.activeElement;
+  const wrapper = document.createElement('div'); wrapper.className = 'modal-backdrop';
+  wrapper.innerHTML = `<section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><header class="modal-header"><h2 id="modal-title">${title}</h2><button class="modal-close" data-action="close-modal" aria-label="Close dialog">×</button></header>${contents}</section>`;
+  document.body.append(wrapper);
+  wrapper.previousFocus = previousFocus;
+  wrapper.querySelector('input,select,button')?.focus();
+  wrapper.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Tab') {
+      const nodes = [...wrapper.querySelectorAll('button,input,select,textarea,a[href]')].filter(n => !n.disabled);
+      if (e.shiftKey && document.activeElement === nodes[0]) { e.preventDefault(); nodes.at(-1).focus(); }
+      else if (!e.shiftKey && document.activeElement === nodes.at(-1)) { e.preventDefault(); nodes[0].focus(); }
     }
+  });
+}
+function closeModal() { const wrapper = document.querySelector('.modal-backdrop'); const previous = wrapper?.previousFocus; wrapper?.remove(); if (previous?.isConnected) previous.focus(); }
+function fieldModal(id) {
+  const f = farmer.fields.find(f => f.id === id) || { name: '', area: 1, crop: 'cotton', location: farmer.village, lat: 20.3899, lon: 78.1307, soil: 'Loam', irrigation: 'Rainfed', sowing: '2027-06-15', status: 'Planning' };
+  openModal(id ? 'A closer look at your field' : 'Add your next field', `<form id="field-form" data-id="${esc(id || '')}"><div class="form-grid"><div class="span2">${inputField('field-name', 'Field name', f.name, 'maxlength="60" placeholder="e.g. West field" required')}</div>${inputField('field-area', 'Land area (hectares)', f.area, 'type="number" min="0.01" max="100000" step="0.01" required')}<div class="field"><label for="field-crop">Current / planned crop</label><select id="field-crop" name="crop">${cropOptions(f.crop)}</select></div><div class="span2">${inputField('field-location', 'Village / district', f.location, 'maxlength="100" required')}</div>${inputField('field-lat', 'Latitude', f.lat, 'type="number" min="-90" max="90" step="any" required')}${inputField('field-lon', 'Longitude', f.lon, 'type="number" min="-180" max="180" step="any" required')}<div class="field"><label for="field-soil">Soil type</label><select id="field-soil" name="soil">${['Black cotton soil', 'Loam', 'Clay loam', 'Sandy loam', 'Unknown'].map(s => `<option ${s === f.soil ? 'selected' : ''}>${s}</option>`).join('')}</select></div><div class="field"><label for="field-irrigation">Irrigation</label><select id="field-irrigation" name="irrigation">${['Rainfed', 'Drip irrigation', 'Sprinkler', 'Canal irrigation'].map(s => `<option ${s === f.irrigation ? 'selected' : ''}>${s}</option>`).join('')}</select></div>${inputField('field-sowing', 'Sowing date', f.sowing, 'type="date" required')}${inputField('field-status', 'Crop stage / status', f.status, 'maxlength="60" required')}</div><p class="error" id="modal-error" role="alert"></p><div class="form-actions"><button type="button" class="btn secondary" data-action="close-modal">Cancel</button><button class="btn" type="submit">Save field ${icon('check')}</button></div></form>`);
+}
+function profileModal() { openModal('Make this workspace yours', `<form id="profile-form"><div class="stack">${inputField('profile-name', 'Name', farmer.name, 'maxlength="60" required')}${inputField('profile-village', 'Village / district', farmer.village, 'maxlength="100" required')}${inputField('profile-experience', 'Years of farming experience', farmer.experience, 'type="number" min="0" max="100" required')}</div><p class="error" id="modal-error" role="alert"></p><div class="form-actions"><button class="btn secondary" type="button" data-action="close-modal">Cancel</button><button class="btn">Save profile</button></div></form>`); }
+function harvestModal() {
+  if (!farmer.fields.length) { toast('Add a field before recording a harvest.'); location.hash = 'fields'; return; }
+  openModal('Record a harvest', `<form id="harvest-form"><div class="form-grid"><div class="field"><label for="harvest-field">Field</label><select id="harvest-field" name="field">${farmer.fields.map(f => `<option value="${esc(f.id)}">${esc(f.name)}</option>`).join('')}</select></div><div class="field"><label for="harvest-crop">Crop</label><select id="harvest-crop" name="crop">${cropOptions('cotton')}</select></div>${inputField('harvest-season', 'Season', 'Kharif 2026', 'maxlength="40" required')}${inputField('harvest-date', 'Harvest date', new Date().toISOString().slice(0, 10), 'type="date" required')}${inputField('harvest-kg', 'Total produce (kg)', '', 'type="number" min="0.01" step="any" placeholder="e.g. 4800" required')}${inputField('harvest-price', 'Sale price (₹/quintal)', 6200, 'type="number" min="0" step="any" required')}${inputField('harvest-cost', 'Total cultivation cost (₹)', 100000, 'type="number" min="0" step="any" required')}${inputField('harvest-note', 'What did you change this season?', '', 'maxlength="200" placeholder="e.g. crop rotation"')}</div><div class="hint" style="margin-top:20px">This record will be saved in this browser only. Enter fictional values while demonstrating the project.</div><p id="modal-error" class="error" role="alert"></p><div class="form-actions"><button class="btn secondary" type="button" data-action="close-modal">Cancel</button><button class="btn">Save harvest</button></div></form>`);
+}
 
-    async function runPrediction() {
-      const crop = document.getElementById('sel-crop').value;
-      const district = document.getElementById('sel-district').value;
-      const data = CROP_DATA[crop] || CROP_DATA.cotton;
+function signIn(profile) { farmer = profile; try { sessionStorage.setItem(SESSION, profile.id); } catch (_) {} result = null; plannerField = ''; location.hash = 'overview'; render(); window.scrollTo(0, 0); }
+function updatePlannerField(id) {
+  const f = farmer.fields.find(f => f.id === id); if (!f) return;
+  const form = document.getElementById('planner-form');
+  for (const [name, value] of Object.entries({ area: f.area, unit: 'ha', lat: f.lat, lon: f.lon, crop: f.crop, water: f.irrigation === 'Rainfed' ? 0 : 200, baseline: CROPS[f.crop].baseline, price: CROPS[f.crop].price })) form.elements.namedItem(name).value = value;
+  plannerField = f.id;
+}
+document.addEventListener('click', e => {
+  const target = e.target.closest('[data-action]'); if (!target) return;
+  const { action, id, tab, crop } = target.dataset;
+  if (action === 'close-modal') { closeModal(); return; }
+  if (action === 'login-tab') { loginTab = tab; render(); return; }
+  if (action === 'demo-login') { let demo = profiles.find(p => p.id === 'ramesh'); if (!demo) { demo = seedFarmer(); profiles.push(demo); } persist(); signIn(demo); return; }
+  if (!farmer) return;
+  if (action === 'logout') { farmer = null; result = null; try { sessionStorage.removeItem(SESSION); } catch (_) {} render(); window.scrollTo(0, 0); }
+  if (action === 'add-field') fieldModal();
+  if (action === 'edit-field') fieldModal(id);
+  if (action === 'edit-profile') profileModal();
+  if (action === 'add-harvest') harvestModal();
+  if (action === 'plan-field') { plannerField = id; result = null; location.hash = 'planner'; render(); window.scrollTo(0, 0); }
+  if (action === 'plan-crop') { location.hash = 'planner'; result = null; render(); const form = document.getElementById('planner-form'); form.elements.namedItem('crop').value = crop; form.elements.namedItem('baseline').value = CROPS[crop].baseline; form.elements.namedItem('price').value = CROPS[crop].price; window.scrollTo(0, 0); }
+  if (action === 'history-tab') { historyTab = tab; render(); }
+  if (action === 'save-plan' && result) { farmer.plans.push({ ...result, id: crypto.randomUUID() }); if (persist()) { target.textContent = 'Saved to your farm history'; target.disabled = true; toast('Scenario saved. Find it in Farm history → Saved plans.'); } }
+  if (action === 'mark-advice') { const advice = farmer.advice.find(a => a.id === id); if (advice) { advice.state = 'Applied'; advice.action = 'Marked as applied in this demo'; advice.outcome = 'Awaiting a recorded harvest outcome'; persist(); render(); toast('Advice marked as applied.'); } }
+});
+document.addEventListener('change', e => {
+  if (!farmer) return;
+  const target = e.target, action = target.dataset.change;
+  if (action === 'plan-field') updatePlannerField(target.value);
+  if (action === 'plan-crop') { const c = CROPS[target.value]; const f = document.getElementById('planner-form'); f.elements.namedItem('baseline').value = c.baseline; f.elements.namedItem('price').value = c.price; }
+  if (action === 'weather-field') { weatherField = target.value; render(); }
+  if (action === 'sale-crop') document.getElementById('sale-price').value = CROPS[target.value].price;
+});
+document.addEventListener('submit', e => {
+  const form = e.target; if (!['login-form', 'create-profile-form', 'planner-form', 'revenue-form', 'field-form', 'profile-form', 'harvest-form'].includes(form.id)) return;
+  e.preventDefault(); const data = Object.fromEntries(new FormData(form));
+  try {
+    if (form.id === 'login-form') { const profile = profiles.find(p => p.email.toLowerCase() === data.email.trim().toLowerCase()); if (!profile || data.password !== DEMO_LOGIN.password) throw new Error('Use the demo email and password shown below, or create a demo profile.'); signIn(profile); }
+    if (form.id === 'create-profile-form') { if (!data.name.trim() || !data.village.trim()) throw new Error('Enter your name and village.'); if (profiles.some(p => p.email.toLowerCase() === data.email.trim().toLowerCase())) throw new Error('A demo profile already uses this email. Sign in using the shared demo password.'); const profile = emptyFarmer({ name: data.name.trim(), email: data.email.trim(), village: data.village.trim() }); profiles.push(profile); if (persist()) signIn(profile); }
+    if (form.id === 'planner-form') { result = analyzeField(data); document.getElementById('planner-error').textContent = ''; document.getElementById('planner-result').innerHTML = resultView(result); if (innerWidth < 850) document.getElementById('planner-result').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    if (form.id === 'revenue-form') { const r = revenue(data.quantity, data.unit, data['sale-price'], data['sale-cost']); document.getElementById('revenue-error').textContent = ''; document.getElementById('revenue-result').innerHTML = saleResult(r, data['sale-price'], data['sale-cost']); }
+    if (form.id === 'field-form') { const lat = Number(data['field-lat']), lon = Number(data['field-lon']), area = Number(data['field-area']); if (!data['field-name'].trim() || !data['field-location'].trim() || !Number.isFinite(area) || area <= 0 || area > 100000 || !Number.isFinite(lat) || Math.abs(lat) > 90 || !Number.isFinite(lon) || Math.abs(lon) > 180) throw new Error('Check the field name, area and coordinates.'); const id = form.dataset.id || crypto.randomUUID(); const f = { id, name: data['field-name'].trim(), location: data['field-location'].trim(), area, crop: data.crop, lat, lon, soil: data.soil, irrigation: data.irrigation, sowing: data['field-sowing'], status: data['field-status'].trim() }; const index = farmer.fields.findIndex(f => f.id === id); if (index < 0) farmer.fields.push(f); else farmer.fields[index] = f; if (persist()) { closeModal(); render(); toast('Field saved to your demo workspace.'); } }
+    if (form.id === 'profile-form') { if (!data['profile-name'].trim() || !data['profile-village'].trim()) throw new Error('Enter a name and village.'); farmer.name = data['profile-name'].trim(); farmer.village = data['profile-village'].trim(); farmer.experience = Number(data['profile-experience']); if (persist()) { closeModal(); render(); toast('Profile saved.'); } }
+    if (form.id === 'harvest-form') { const f = farmer.fields.find(f => f.id === data.field); const kg = Number(data['harvest-kg']), price = Number(data['harvest-price']), cost = Number(data['harvest-cost']); if (!f || !Number.isFinite(kg) || kg <= 0 || ![price, cost].every(n => Number.isFinite(n) && n >= 0)) throw new Error('Check the field, quantity, price and cost.'); farmer.harvests.unshift({ id: crypto.randomUUID(), field: f.id, crop: data.crop, season: data['harvest-season'].trim(), date: data['harvest-date'], kg, area: f.area, price, cost, note: data['harvest-note'].trim(), sample: false }); if (persist()) { closeModal(); historyTab = 'harvests'; location.hash = 'history'; render(); toast('Harvest recorded in this browser.'); } }
+  } catch (error) { const node = document.getElementById(['login-form', 'create-profile-form'].includes(form.id) ? 'login-error' : form.id === 'planner-form' ? 'planner-error' : form.id === 'revenue-form' ? 'revenue-error' : 'modal-error'); if (node) node.textContent = error.message; }
+});
+window.addEventListener('hashchange', () => { render(); window.scrollTo(0, 0); });
+// Remove the previous Flutter offline shell, while preserving user preferences.
+if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(rs => Promise.all(rs.map(r => r.unregister()))).catch(() => {});
+if ('caches' in window) caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('flutter-')).map(k => caches.delete(k)))).catch(() => {});
+render();
 
-      // Update the repository demo scenario; no live model output is implied.
-      document.getElementById('yield-value').innerText = data.yieldKg.toLocaleString();
-      document.getElementById('model-conf').innerHTML = `Confidence: <strong>${data.confidence}</strong>`;
-      document.getElementById('fusion-ndvi').innerText = data.ndvi;
-      document.getElementById('fusion-rain').innerText = data.rain;
-      document.getElementById('fusion-soil').innerText = data.soil;
-
-      document.getElementById('val-curr-price').innerText = `₹${data.spotPrice.toLocaleString()} / Qtl`;
-      document.getElementById('val-proj-price').innerText = `₹${data.forecastPrice.toLocaleString()} / Qtl (${data.change})`;
-
-      // Advisory text
-      if (currentLang === 'hi') {
-        document.getElementById('yield-adv-text').innerText = data.advHi;
-      } else if (currentLang === 'mr') {
-        document.getElementById('yield-adv-text').innerText = data.advMr;
-      } else {
-        document.getElementById('yield-adv-text').innerText = data.adv;
-      }
-
-      // Update Chart
-      if (priceChart) {
-        priceChart.data.datasets[0].data = data.prices;
-        priceChart.update();
-      }
-    }
-
-    function setLanguage(lang, button) {
-      currentLang = lang;
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-      if (button) button.classList.add('active');
-
-      const t = translations[lang];
-      document.getElementById('hero-title').innerText = t.heroTitle;
-      document.getElementById('hero-subtitle').innerText = t.heroSubtitle;
-      document.getElementById('card-yield-title').innerText = t.yieldTitle;
-      document.getElementById('card-price-title').innerText = t.priceTitle;
-      document.getElementById('card-pest-title').innerText = t.pestTitle;
-      document.getElementById('card-satellite-title').innerText = t.satelliteTitle;
-      document.getElementById('btn-predict-text').innerText = t.runBtn;
-      document.getElementById('lbl-curr-price').innerText = t.currPrice;
-      document.getElementById('lbl-proj-price').innerText = t.projPrice;
-
-      runPrediction();
-    }
-
-    function simulateStory(cropType) {
-      document.getElementById('sel-crop').value = cropType;
-      if (cropType === 'soybean') {
-        document.getElementById('sel-district').value = 'nagpur';
-        document.getElementById('sel-mandi').value = 'nagpur';
-      } else {
-        document.getElementById('sel-district').value = 'yavatmal';
-        document.getElementById('sel-mandi').value = 'yavatmal';
-      }
-      runPrediction();
-    }
-
-    async function checkApiConnection() {
-      const label = document.getElementById('api-status-text');
-      try {
-        const response = await fetch('https://kisaan-ml-render.onrender.com/health', { signal: AbortSignal.timeout(90000) });
-        if (!response.ok) throw new Error('Service unavailable');
-        const health = await response.json();
-        label.textContent = health.status === 'healthy' ? 'Render API connected • Demo data' : 'API unavailable • Demo data';
-      } catch (_) {
-        label.textContent = 'API unavailable • Demo data';
-      }
-    }
-
-    // Retire the previous Flutter shell without deleting saved profiles.
-    if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(registrations => Promise.all(registrations.map(r => r.unregister()))).catch(() => {});
-    if ('caches' in window) caches.keys().then(keys => Promise.all(keys.filter(k => k.startsWith('flutter-')).map(k => caches.delete(k)))).catch(() => {});
-
-    window.addEventListener('DOMContentLoaded', () => {
-      initChart();
-      runPrediction();
-    });

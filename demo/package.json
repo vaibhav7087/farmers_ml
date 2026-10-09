@@ -1,0 +1,8 @@
+{
+  "name": "kisaan-farmer-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --check dashboard.js && node --test model.test.js"
+  }
+}
