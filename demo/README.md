@@ -65,12 +65,12 @@ factor, temperature/water factors and sample yield/cost/price assumptions.
 Soil, source reliability, varieties and pests are not modeled.
 
 Revenue has **Sale calculator**, **Estimated yield & revenue**, and **Find a buyer**.
-Estimated revenue includes yield, gross income, editable cost components,
+Estimated revenue includes yield, gross income, per-land cost breakdowns,
 net margin, margin percentage, break-even price and sensitivity scenarios.
 Five fictional buyer listings can be filtered by crop/district and shortlisted.
 No buyer is contacted, and no actual transaction is made.
 
-Nine automated model/geometry tests pass. Browser validation covers persistent
+Ten automated model/geometry tests pass. Browser validation covers persistent
 boundary save/reopen, mobile area transfer, crop comparison, cost arithmetic,
 buyer filtering/shortlisting and annual planting-window controls.
 
@@ -81,3 +81,15 @@ then create an API key restricted to this API and the site's authorized referrer
 Use custom polygon/freehand input over Maps, and the geometry library for area.
 The old DrawingManager library is unavailable in current versions; do not use it.
 No key or paid service is configured by this demo.
+
+## Saved-land views
+
+Estimated yield & revenue automatically lists every field in the signed-in
+farmer's saved records, with land names, locations, crops, yield, gross revenue,
+costs, profit and combined farm totals. Expand a land card for its assumptions
+and cost breakdown. There is no field selector or calculation form in this view.
+Changes to My fields automatically feed the next revenue view.
+
+Best crops for this land presents saved lands as selectable cards. Choosing a
+card opens that land's crop rankings and synchronizes the weather location.
+Each card shows its saved name, location, area, crop and water source.

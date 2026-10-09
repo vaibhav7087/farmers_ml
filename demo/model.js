@@ -95,3 +95,18 @@ export function compareCrops(field, {sowing = field.sowing, water = field.waterM
   const costs = {cotton:50000,soybean:36000,maize:42000,wheat:35000};
   return Object.entries(CROPS).map(([id,crop]) => analyzeField({crop:id,area:field.area,unit:'ha',lat:field.lat,lon:field.lon,sowing,water,baseline:crop.baseline,price:crop.price,cost:costs[id]*field.area,locationDemo:true})).sort((a,b)=>b.factor-a.factor || b.net-a.net);
 }
+export function estimateFarmEarnings(fields) {
+  const lands = fields.map(field => {
+    const scenario = compareCrops(field).find(r => r.crop === field.crop);
+    const cost = Math.round(scenario.cost);
+    const labour = Math.round(cost * 0.2);
+    const waterCost = Number(scenario.water) > 0 ? Math.round(cost * 0.15) : 0;
+    const costs = { inputs: cost - labour - waterCost, labour, waterCost, saleCost: 0 };
+    return { field, scenario: { ...scenario, cost, net: scenario.gross - cost }, costs };
+  });
+  const totals = lands.reduce((sum, { scenario: r }) => ({
+    area: sum.area + r.areaHa, yieldKg: sum.yieldKg + r.totalKg,
+    gross: sum.gross + r.gross, cost: sum.cost + r.cost, net: sum.net + r.net
+  }), { area: 0, yieldKg: 0, gross: 0, cost: 0, net: 0 });
+  return { lands, totals };
+}

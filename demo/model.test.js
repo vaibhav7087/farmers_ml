@@ -1,7 +1,26 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { hectares, revenue, seedFarmer, analyzeField, compareCrops, exampleForecast } from './model.js';
+import { hectares, revenue, seedFarmer, analyzeField, compareCrops, exampleForecast, estimateFarmEarnings } from './model.js';
 const input = { crop: 'cotton', area: 2, unit: 'ha', lat: 20.39, lon: 78.13, sowing: '2027-06-15', baseline: 2200, water: 0, price: 6200, cost: 100000 };
+test('farm earnings automatically include each saved land and reconcile all totals', () => {
+  const fields = seedFarmer().fields;
+  const before = JSON.stringify(fields);
+  const { lands, totals } = estimateFarmEarnings(fields);
+  assert.deepEqual(lands.map(l => l.field.id), ['north', 'river', 'east']);
+  assert.deepEqual(lands.map(l => l.scenario.crop), ['cotton', 'soybean', 'wheat']);
+  assert.equal(lands[0].scenario.totalKg, 5280);
+  assert.equal(lands[1].scenario.totalKg, 2880);
+  assert.ok(Math.abs(totals.area - 5.2) < 1e-9);
+  assert.equal(totals.gross, lands.reduce((s,l) => s + l.scenario.totalKg / 100 * l.scenario.price, 0));
+  assert.equal(totals.net, totals.gross - totals.cost);
+  for (const { costs, scenario } of lands) assert.equal(Object.values(costs).reduce((a,b) => a+b, 0), scenario.cost);
+  assert.equal(lands[1].costs.waterCost, 0);
+  assert.equal(JSON.stringify(fields), before);
+  const added = estimateFarmEarnings([...fields, { ...fields[0], id:'new-land', area:1 }]);
+  assert.equal(added.lands.length, 4);
+  assert.equal(added.totals.yieldKg - totals.yieldKg, 2200);
+  assert.deepEqual(estimateFarmEarnings([]).totals, { area:0,yieldKg:0,gross:0,cost:0,net:0 });
+});
 test('crop comparison responds to water, season, land area and demo location',()=>{
  const field={...seedFarmer().fields[0],waterMm:0};
  const dry=compareCrops(field),wet=compareCrops(field,{water:200});
