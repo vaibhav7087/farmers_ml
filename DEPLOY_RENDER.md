@@ -15,7 +15,7 @@ Alternatively create Key Value first (Free, Singapore, eviction policy noevictio
 - Branch: codex/render-deployment
 - Root Directory: render-service
 - Runtime: Node
-- Build Command: npm ci && npm run build
+- Build Command: npm ci --include=dev && npm run build
 - Start Command: npm start
 - Instance Type: Free
 - Environment: NODE_ENV=production, NODE_VERSION=22.22.0, REDIS_URL=<internal Key Value URL>
@@ -39,3 +39,4 @@ npm run typecheck
 npm test
 
 To run locally, set REDIS_URL to a local Redis URL, then npm start.
+

@@ -102,3 +102,4 @@ Desktop.ini
 !package.json
 !package-lock.json
 !tsconfig.json
+.tools/

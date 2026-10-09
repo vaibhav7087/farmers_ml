@@ -5,7 +5,7 @@ services:
     plan: free
     region: singapore
     rootDir: render-service
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /health
     envVars:
@@ -24,3 +24,4 @@ services:
     region: singapore
     maxmemoryPolicy: noeviction
     ipAllowList: []
+
