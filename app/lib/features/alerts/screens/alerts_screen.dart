@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
-import '../../features/profile/providers/profile_provider.dart';
+import '../../../core/theme.dart';
+import '../../profile/providers/profile_provider.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
-import '../../core/router.dart';
+import '../../../core/theme.dart';
+import '../../../core/router.dart';
 import '../providers/advisory_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
@@ -56,7 +57,7 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
                   _buildAdvisoryResult(provider.currentAdvisory!),
               ],
             ),
-          ),
+          );
         },
       ),
     );
@@ -139,7 +140,8 @@ class _AdvisoryScreenState extends State<AdvisoryScreen> {
             ),
           ],
         ),
-      );
+      ),
+    );
   }
 
   Widget _buildActionButtons() {

@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../core/theme.dart';
-import '../../core/router.dart';
+import '../../../core/theme.dart';
+import '../../../core/router.dart';
 
-class YieldDetailScreen extends StatelessWidget {
+class YieldDetailScreen extends StatefulWidget {
   final String district;
   final String crop;
 
   const YieldDetailScreen({super.key, required this.district, required this.crop});
 
   @override
+  State<YieldDetailScreen> createState() => _YieldDetailScreenState();
+}
+
+class _YieldDetailScreenState extends State<YieldDetailScreen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('$crop उपज विवरण - $district'),
+        title: Text('${widget.crop} उपज विवरण - ${widget.district}'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -160,7 +165,7 @@ class YieldDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text('${(f['importance'] as double * 100).toInt()}%', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
+                  Text('${((f['importance'] as double) * 100).toInt()}%', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
                 ],
               ),
             )),

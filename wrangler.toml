@@ -8,8 +8,11 @@ account_id = "e4c9934ee538c49b0b09fa1eb6f57162"
 ENVIRONMENT = "production"
 
 [vars]
-MODEL_BUCKET = "kisaan-ml-models"
 CACHE_TTL = "3600"
+
+[[r2_buckets]]
+binding = "MODEL_BUCKET"
+bucket_name = "kisaan-ml-models"
 
 [[kv_namespaces]]
 binding = "CACHE_KV"

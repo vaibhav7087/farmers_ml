@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/theme.dart';
 import 'core/router.dart';
-import 'features/auth/providers/auth_provider.dart';
-import 'features/advisory/providers/advisory_provider.dart';
-import 'features/profile/providers/profile_provider.dart';
+import '../features/auth/providers/auth_provider.dart';
+import '../features/advisory/providers/advisory_provider.dart';
+import '../features/profile/providers/profile_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

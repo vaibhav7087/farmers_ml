@@ -29,10 +29,12 @@ export async function healthCheck(c: any) {
   } catch {}
 
   try {
-    await c.env.MODEL_BUCKET.head('health/check');
-    checks.r2 = true;
+    if (typeof c.env.MODEL_BUCKET?.head === 'function') {
+      await c.env.MODEL_BUCKET.head('health/check');
+      checks.r2 = true;
+    }
   } catch {}
 
-  const healthy = checks.kv && checks.db && checks.r2;
-  return c.json({ status: healthy ? 'healthy' : 'degraded', checks }, healthy ? 200 : 503);
+  const healthy = checks.kv && checks.db;
+  return c.json({ status: healthy ? (checks.r2 ? 'healthy' : 'degraded') : 'unhealthy', checks }, healthy ? 200 : 503);
 }

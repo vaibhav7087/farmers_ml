@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
-import '../../features/profile/providers/profile_provider.dart';
+import '../../../core/theme.dart';
+import '../../profile/providers/profile_provider.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,7 +119,7 @@ class SettingsScreen extends StatelessWidget {
 
   Widget _buildNotificationTile(ProfileProvider profile) {
     return SwitchListTile(
-      leading: const Icon(Icons.notifications),
+      secondary: const Icon(Icons.notifications),
       title: const Text('पुश सूचनाएं'),
       subtitle: const Text('भाव अलर्ट, मौसम चेतावनी, प्रकोप सूचनाएं'),
       value: profile.notificationsEnabled,
@@ -154,7 +160,7 @@ class SettingsScreen extends StatelessWidget {
 
   Widget _buildThemeTile(ProfileProvider profile) {
     return SwitchListTile(
-      leading: const Icon(Icons.dark_mode),
+      secondary: const Icon(Icons.dark_mode),
       title: const Text('डार्क मोड'),
       subtitle: const Text('रात में आंखों के लिए आरामदायक'),
       value: profile.darkMode,

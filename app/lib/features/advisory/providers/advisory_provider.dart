@@ -52,7 +52,10 @@ class AdvisoryProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  static const String baseUrl = 'https://kisaan-ml-api.workers.dev/api/v1';
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://kisaan-ml-api.bylancetechnologies.workers.dev/api/v1',
+  );
 
   Future<void> fetchAdvisory({
     required String district,
@@ -69,13 +72,7 @@ class AdvisoryProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token');
 
-      final uri = Uri.parse('$baseUrl/advisory').replace(queryParameters: {
-        'district': district,
-        'crop': crop,
-        'mandi': mandi,
-        if (variety != null) 'variety': variety,
-        if (sowingWeek != null) 'sowing_week': sowingWeek.toString(),
-      });
+      final uri = Uri.parse('$baseUrl/advisory');
 
       final response = await http.post(
         uri,
@@ -83,6 +80,13 @@ class AdvisoryProvider extends ChangeNotifier {
           'Content-Type': 'application/json',
           if (token != null) 'Authorization': 'Bearer $token',
         },
+        body: jsonEncode({
+          'district': district,
+          'crop': crop,
+          'mandi': mandi,
+          if (variety != null) 'variety': variety,
+          if (sowingWeek != null) 'sowing_week': sowingWeek,
+        }),
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
