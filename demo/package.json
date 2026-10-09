@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --check dashboard.js && node --test model.test.js"
+    "test": "node --check dashboard.js && node --check land-map.js && node --test model.test.js land-geometry.test.js"
   }
 }
+

@@ -43,3 +43,41 @@ harvest recording, saved scenarios, revenue conversion and mobile navigation.
 
 Render serves demo/ from master. The Blueprint uses npm test as the build command
 and publishes the directory as a static website. No frontend dependencies are required.
+
+## Land, weather, earnings and buyers
+
+Add or edit a field, then select **Add my land info using Google Maps**.
+This opens an original illustrative map demo, not live Google Maps.
+Enter a center location, tap corners or trace with a mouse/finger, finish the
+outline, review hectares/acres/perimeter, then apply and save the field.
+Boundary vertices and precise demo area are stored with the browser profile.
+Editing area or center manually detaches the old boundary to avoid mismatched records.
+Keyboard drawing: focus the map, use arrows to move the cursor, Enter to add corners.
+A Google Maps link opens the entered center externally; drawing stays in this app.
+
+Fields also save irrigation availability and water source.
+Weather includes location-selected fictional weather profiles, seeded seasonal
+history, a ranked crop comparison and **Next year & harvest** with a monthly
+annual scenario, planting-window comparison and yield/revenue examples.
+Year selection chooses a dummy annual rainfall scenario, not a long-range forecast.
+Crop comparison uses three fixed fictional seasonal profiles, a sowing-season
+factor, temperature/water factors and sample yield/cost/price assumptions.
+Soil, source reliability, varieties and pests are not modeled.
+
+Revenue has **Sale calculator**, **Estimated yield & revenue**, and **Find a buyer**.
+Estimated revenue includes yield, gross income, editable cost components,
+net margin, margin percentage, break-even price and sensitivity scenarios.
+Five fictional buyer listings can be filtered by crop/district and shortlisted.
+No buyer is contacted, and no actual transaction is made.
+
+Nine automated model/geometry tests pass. Browser validation covers persistent
+boundary save/reopen, mobile area transfer, crop comparison, cost arithmetic,
+buyer filtering/shortlisting and annual planting-window controls.
+
+## Future live Google Maps prerequisites
+
+Create a Google Cloud project, enable billing and the Maps JavaScript API,
+then create an API key restricted to this API and the site's authorized referrers.
+Use custom polygon/freehand input over Maps, and the geometry library for area.
+The old DrawingManager library is unavailable in current versions; do not use it.
+No key or paid service is configured by this demo.

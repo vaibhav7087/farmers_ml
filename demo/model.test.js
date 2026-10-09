@@ -1,7 +1,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { hectares, revenue, seedFarmer, analyzeField } from './model.js';
+import { hectares, revenue, seedFarmer, analyzeField, compareCrops, exampleForecast } from './model.js';
 const input = { crop: 'cotton', area: 2, unit: 'ha', lat: 20.39, lon: 78.13, sowing: '2027-06-15', baseline: 2200, water: 0, price: 6200, cost: 100000 };
+test('crop comparison responds to water, season, land area and demo location',()=>{
+ const field={...seedFarmer().fields[0],waterMm:0};
+ const dry=compareCrops(field),wet=compareCrops(field,{water:200});
+ assert.equal(dry[0].crop,'maize');assert.equal(wet[0].crop,'cotton');
+ const twice=compareCrops({...field,area:field.area*2});
+ for(const r of dry){const t=twice.find(t=>t.crop===r.crop);assert.equal(t.totalKg,r.totalKg*2);assert.equal(t.net,r.net*2);}
+ assert.ok(compareCrops(field,{sowing:'2027-11-15',water:500}).find(r=>r.crop==='wheat').factor>dry.find(r=>r.crop==='wheat').factor);
+ assert.notDeepEqual(exampleForecast(field),exampleForecast({...field,lon:78.23}));
+ assert.throws(()=>compareCrops(field,{water:-1}),/negative/);
+});
 test('land area scales output and revenue; acre conversion is exact', () => {
   assert.ok(Math.abs(hectares(1, 'acre') - 0.40468564224) < 1e-10);
   const one = analyzeField({ ...input, area: 1 }), two = analyzeField(input);
