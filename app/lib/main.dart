@@ -1,3 +1,4 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/theme.dart';
@@ -31,6 +32,7 @@ class KisaanMLApp extends StatelessWidget {
         routerConfig: router,
         debugShowCheckedModeBanner: false,
         locale: const Locale('hi', 'IN'),
+        localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
         supportedLocales: const [
           Locale('en', 'US'),
           Locale('hi', 'IN'),
@@ -40,5 +42,6 @@ class KisaanMLApp extends StatelessWidget {
     );
   }
 }
+
 
 
