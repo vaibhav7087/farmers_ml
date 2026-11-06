@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme.dart';
 import '../../../core/router.dart';
@@ -40,13 +40,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  'Kisaan-ML में वापस स्वागत है',
+                  'Welcome back to Kisaan-ML',
                   style: Theme.of(context).textTheme.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'अपना फोन नंबर डालें ताकि हम OTP भेज सकें',
+                  'Enter your phone number to receive an OTP',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey[600]),
                   textAlign: TextAlign.center,
                 ),
@@ -56,8 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
                     decoration: const InputDecoration(
-                      labelText: 'फोन नंबर',
-                      hintText: '10 अंकों का नंबर डालें',
+                      labelText: 'Phone number',
+                      hintText: 'Enter a 10-digit number',
                       prefixIcon: Icon(Icons.phone),
                       prefixText: '+91 ',
                     ),
@@ -70,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: _isLoading ? null : _sendOTP,
                       child: _isLoading
                           ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Text('OTP भेजें'),
+                          : const Text('Send OTP'),
                     ),
                   ),
                 ] else ...[
@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                       labelText: 'OTP',
-                      hintText: '6 अंकों का OTP डालें',
+                      hintText: 'Enter a 6-digit OTP',
                       prefixIcon: Icon(Icons.lock_outline),
                     ),
                     maxLength: 6,
@@ -91,13 +91,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: _isLoading ? null : _verifyOTP,
                       child: _isLoading
                           ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Text('सत्यापित करें'),
+                          : const Text('Verify'),
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextButton(
                     onPressed: () => setState(() => _otpSent = false),
-                    child: const Text('OTP फिर से भेजें'),
+                    child: const Text('Resend OTP'),
                   ),
                 ],
                 if (_error != null) ...[
@@ -115,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _sendOTP() async {
     final phone = _phoneController.text.trim();
     if (phone.length != 10) {
-      setState(() => _error = 'कृपया 10 अंकों का वैध नंबर डालें');
+      setState(() => _error = 'Please enter a valid 10-digit number');
       return;
     }
 
@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _verifyOTP() async {
     final otp = _otpController.text.trim();
     if (otp.length != 6) {
-      setState(() => _error = 'कृपया 6 अंकों का OTP डालें');
+      setState(() => _error = 'Please enter a 6-digit OTP');
       return;
     }
 
@@ -157,3 +157,4 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 }
+

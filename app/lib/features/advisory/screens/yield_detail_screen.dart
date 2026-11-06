@@ -18,29 +18,29 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.crop} उपज विवरण - ${widget.district}'),
+        title: Text('${widget.crop} Yield details - ${widget.district}'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSummaryCard(),
+            _buildSummaryCard(context),
             const SizedBox(height: 24),
-            _buildChartCard(),
+            _buildChartCard(context),
             const SizedBox(height: 24),
-            _buildFeatureImportance(),
+            _buildFeatureImportance(context),
             const SizedBox(height: 24),
-            _buildSatelliteCard(),
+            _buildSatelliteCard(context),
             const SizedBox(height: 24),
-            _buildRecommendations(),
+            _buildRecommendations(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -49,9 +49,9 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat('पूर्वानुमानित उपज', '2,150 kg/ha', Icons.grass, AppTheme.primaryGreen),
-                _buildStat('आत्मविश्वास', '78%', Icons.verified, AppTheme.accentOrange),
-                _buildStat('पिछले साल', '1,980 kg/ha', Icons.history, Colors.blue),
+                _buildStat(context, 'Predicted yield', '2,150 kg/ha', Icons.grass, AppTheme.primaryGreen),
+                _buildStat(context, 'Confidence', '78%', Icons.verified, AppTheme.accentOrange),
+                _buildStat(context, 'Last year', '1,980 kg/ha', Icons.history, Colors.blue),
               ],
             ),
             const SizedBox(height: 16),
@@ -59,9 +59,9 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildStat('बुवाई सप्ताह', '26', Icons.calendar_today, Colors.purple),
-                _buildStat('मौसम', 'खरीफ', Icons.wb_sunny, Colors.orange),
-                _buildStat('सैटेलाइट', 'सक्रिय', Icons.satellite, Colors.teal),
+                _buildStat(context, 'Sowing week', '26', Icons.calendar_today, Colors.purple),
+                _buildStat(context, 'Weather', 'Kharif', Icons.wb_sunny, Colors.orange),
+                _buildStat(context, 'Satellite', 'Active', Icons.satellite, Colors.teal),
               ],
             ),
           ],
@@ -70,7 +70,7 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
     );
   }
 
-  Widget _buildStat(String label, String value, IconData icon, Color color) {
+  Widget _buildStat(BuildContext context, String label, String value, IconData icon, Color color) {
     return Column(
       children: [
         Container(
@@ -85,14 +85,14 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
     );
   }
 
-  Widget _buildChartCard() {
+  Widget _buildChartCard(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('उपज पूर्वानुमान प्रवृत्ति', style: Theme.of(context).textTheme.titleMedium),
+            Text('Yield forecast trend', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             SizedBox(
               height: 200,
@@ -105,7 +105,7 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
                       sideTitles: SideTitles(
                         showTitles: true,
                         getTitlesWidget: (value, meta) {
-                          const labels = ['जन', 'फर', 'मार', 'अप्र', 'मई', 'जून', 'जुल', 'अग', 'सित', 'अक्ट', 'नव', 'दिस'];
+                          const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                           return SideTitleWidget(child: Text(labels[value.toInt() % 12]), axisSide: AxisSide.bottom);
                         },
                       ),
@@ -131,14 +131,14 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
     );
   }
 
-  Widget _buildFeatureImportance() {
+  Widget _buildFeatureImportance(BuildContext context) {
     final features = [
-      {'name': 'NDVI (सैटेलाइट)', 'importance': 0.32},
-      {'name': 'मिट्टी N-P-K', 'importance': 0.24},
-      {'name': 'वर्षा (खरीफ)', 'importance': 0.18},
-      {'name': 'बुवाई सप्ताह', 'importance': 0.12},
-      {'name': 'तापमान', 'importance': 0.08},
-      {'name': 'आर्द्रता', 'importance': 0.06},
+      {'name': 'NDVI (Satellite)', 'importance': 0.32},
+      {'name': 'Soil N-P-K', 'importance': 0.24},
+      {'name': 'Rainfall (Kharif)', 'importance': 0.18},
+      {'name': 'Sowing week', 'importance': 0.12},
+      {'name': 'Temperature', 'importance': 0.08},
+      {'name': 'Humidity', 'importance': 0.06},
     ];
 
     return Card(
@@ -147,7 +147,7 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('महत्वपूर्ण कारक (SHAP)', style: Theme.of(context).textTheme.titleMedium),
+            Text('Key factors (SHAP)', style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 16),
             ...features.map((f) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
@@ -175,7 +175,7 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
     );
   }
 
-  Widget _buildSatelliteCard() {
+  Widget _buildSatelliteCard(BuildContext context) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -186,30 +186,30 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
               children: [
                 const Icon(Icons.satellite, color: Colors.teal),
                 const SizedBox(width: 8),
-                Text('सैटेलाइट स्वास्थ्य सूचकांक', style: Theme.of(context).textTheme.titleMedium),
+                Text('Satellite health indicators', style: Theme.of(context).textTheme.titleMedium),
               ],
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(child: _buildSatStat('NDVI', '0.68', 'अच्छा वनस्पति स्वास्थ्य')),
+                Expanded(child: _buildSatStat(context, 'NDVI', '0.68', 'Good vegetation health')),
                 const VerticalDivider(),
-                Expanded(child: _buildSatStat('EVI', '0.54', 'उन्नत वनस्पति सूचकांक')),
+                Expanded(child: _buildSatStat(context, 'EVI', '0.54', 'Enhanced vegetation index')),
                 const VerticalDivider(),
-                Expanded(child: _buildSatStat('बादल कवर', '12%', 'कम - विश्वसनीय डेटा')),
+                Expanded(child: _buildSatStat(context, 'Cloud cover', '12%', 'Low - reliable data')),
               ],
             ),
             const SizedBox(height: 16),
             const LinearProgressIndicator(value: 0.68, color: Colors.teal, minHeight: 8),
             const SizedBox(height: 8),
-            Text('NDVI: 0.68 - फसल स्वस्थ है, सामान्य से थोड़ा ऊपर', style: Theme.of(context).textTheme.bodySmall),
+            Text('NDVI: 0.68 - healthy crop, slightly above normal', style: Theme.of(context).textTheme.bodySmall),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSatStat(String label, String value, String desc) {
+  Widget _buildSatStat(BuildContext context, String label, String value, String desc) {
     return Column(
       children: [
         Text(value, style: Theme.of(context).textTheme.headlineSmall?.copyWith(color: Colors.teal)),
@@ -219,12 +219,12 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
     );
   }
 
-  Widget _buildRecommendations() {
+  Widget _buildRecommendations(BuildContext context) {
     final recs = [
-      'NDVI मजबूत है - उर्वरक टॉप-ड्रेसिंग समय पर करें',
-      'वर्षा पूर्वानुमान सामान्य - सिंचाई योजना सामान्य रखें',
-      'कीट निगरानी बढ़ाएं - खरीफ में सफेद मक्खी का जोखिम',
-      'कटाई सप्ताह 42-44 लक्ष्य रखें - बाजार भाव चरम पर',
+      'Strong NDVI - apply fertilizer top dressing on time',
+      'Normal rainfall forecast - maintain regular irrigation',
+      'Increase pest monitoring - whitefly risk during Kharif',
+      'Target harvest in weeks 42-44 - market prices peak',
     ];
 
     return Card(
@@ -237,7 +237,7 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
               children: [
                 const Icon(Icons.lightbulb_outline, color: AppTheme.accentOrange),
                 const SizedBox(width: 8),
-                Text('कार्रवाई योग्य सिफारिशें', style: Theme.of(context).textTheme.titleMedium),
+                Text('Actionable recommendations', style: Theme.of(context).textTheme.titleMedium),
               ],
             ),
             const SizedBox(height: 16),
@@ -258,3 +258,4 @@ class _YieldDetailScreenState extends State<YieldDetailScreen> {
     );
   }
 }
+

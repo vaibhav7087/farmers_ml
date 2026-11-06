@@ -1,0 +1,9 @@
+{
+  "name": "kisaan-farmer-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --check dashboard.js && node --check land-map.js && node --test model.test.js land-geometry.test.js"
+  }
+}
+

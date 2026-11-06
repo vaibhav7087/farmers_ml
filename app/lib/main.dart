@@ -1,10 +1,11 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/theme.dart';
 import 'core/router.dart';
-import '../features/auth/providers/auth_provider.dart';
-import '../features/advisory/providers/advisory_provider.dart';
-import '../features/profile/providers/profile_provider.dart';
+import 'features/auth/providers/auth_provider.dart';
+import 'features/advisory/providers/advisory_provider.dart';
+import 'features/profile/providers/profile_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,13 +24,15 @@ class KisaanMLApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider()..load()),
       ],
       child: MaterialApp.router(
-        title: 'Kisaan-ML',
+        title: 'Kisaan-ML Demo',
+        builder: (context, child) => Banner(message: 'DEMO', location: BannerLocation.topEnd, child: child!),
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
         routerConfig: router,
         debugShowCheckedModeBanner: false,
-        locale: const Locale('hi', 'IN'),
+        locale: const Locale('en', 'US'),
+        localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
         supportedLocales: const [
           Locale('en', 'US'),
           Locale('hi', 'IN'),
@@ -39,3 +42,6 @@ class KisaanMLApp extends StatelessWidget {
     );
   }
 }
+
+
+

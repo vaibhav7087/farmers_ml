@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme.dart';
 import '../../profile/providers/profile_provider.dart';
@@ -15,37 +15,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('सेटिंग्स')),
+      appBar: AppBar(title: const Text('Settings')),
       body: Consumer<ProfileProvider>(
         builder: (context, profile, _) {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _buildSection('भाषा और क्षेत्र', [
-                _buildLanguageTile(profile),
-                _buildRegionTile(profile),
+              _buildSection(context, 'Language and region', [
+                _buildLanguageTile(context, profile),
+                _buildRegionTile(context, profile),
               ]),
               const SizedBox(height: 24),
-              _buildSection('सूचनाएं', [
-                _buildNotificationTile(profile),
-                _buildAlertPreferencesTile(),
+              _buildSection(context, 'Notifications', [
+                _buildNotificationTile(context, profile),
+                _buildAlertPreferencesTile(context),
               ]),
               const SizedBox(height: 24),
-              _buildSection('दिखावट', [
-                _buildThemeTile(profile),
+              _buildSection(context, 'Appearance', [
+                _buildThemeTile(context, profile),
               ]),
               const SizedBox(height: 24),
-              _buildSection('डेटा और गोपनीयता', [
-                _buildDataUsageTile(),
-                _buildCacheTile(),
-                _buildExportTile(),
-                _buildDeleteTile(),
+              _buildSection(context, 'Data and privacy', [
+                _buildDataUsageTile(context),
+                _buildCacheTile(context),
+                _buildExportTile(context),
+                _buildDeleteTile(context),
               ]),
               const SizedBox(height: 24),
-              _buildSection('ऐप के बारे में', [
-                _buildVersionTile(),
-                _buildLicenseTile(),
-                _buildSupportTile(),
+              _buildSection(context, 'About the app', [
+                _buildVersionTile(context),
+                _buildLicenseTile(context),
+                _buildSupportTile(context),
               ]),
               const SizedBox(height: 32),
               _buildLogoutButton(context),
@@ -56,7 +56,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSection(String title, List<Widget> children) {
+  Widget _buildSection(BuildContext context, String title, List<Widget> children) {
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,10 +71,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildLanguageTile(ProfileProvider profile) {
+  Widget _buildLanguageTile(BuildContext context, ProfileProvider profile) {
     return ListTile(
       leading: const Icon(Icons.language),
-      title: const Text('भाषा'),
+      title: const Text('Language'),
       subtitle: Text(_getLanguageName(profile.preferredLanguage)),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _showLanguageDialog(context, profile),
@@ -83,8 +83,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   String _getLanguageName(String code) {
     switch (code) {
-      case 'hi': return 'हिंदी';
-      case 'mr': return 'मराठी';
+      case 'hi': return 'Hindi';
+      case 'mr': return 'Marathi';
       default: return 'English';
     }
   }
@@ -93,46 +93,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('भाषा चुनें'),
+        title: const Text('Choose language'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            RadioListTile<String>(title: const Text('हिंदी'), value: 'hi', groupValue: profile.preferredLanguage, onChanged: (v) => profile.setLanguage(v!)),
-            RadioListTile<String>(title: const Text('मराठी'), value: 'mr', groupValue: profile.preferredLanguage, onChanged: (v) => profile.setLanguage(v!)),
+            RadioListTile<String>(title: const Text('Hindi'), value: 'hi', groupValue: profile.preferredLanguage, onChanged: (v) => profile.setLanguage(v!)),
+            RadioListTile<String>(title: const Text('Marathi'), value: 'mr', groupValue: profile.preferredLanguage, onChanged: (v) => profile.setLanguage(v!)),
             RadioListTile<String>(title: const Text('English'), value: 'en', groupValue: profile.preferredLanguage, onChanged: (v) => profile.setLanguage(v!)),
           ],
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('ठीक है'))],
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
       ),
     );
   }
 
-  Widget _buildRegionTile(ProfileProvider profile) {
+  Widget _buildRegionTile(BuildContext context, ProfileProvider profile) {
     return ListTile(
       leading: const Icon(Icons.location_on),
-      title: const Text('क्षेत्र/राज्य'),
-      subtitle: const Text('महाराष्ट्र (डिफॉल्ट)'),
+      title: const Text('Region / state'),
+      subtitle: const Text('Maharashtra (default)'),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {},
     );
   }
 
-  Widget _buildNotificationTile(ProfileProvider profile) {
+  Widget _buildNotificationTile(BuildContext context, ProfileProvider profile) {
     return SwitchListTile(
       secondary: const Icon(Icons.notifications),
-      title: const Text('पुश सूचनाएं'),
-      subtitle: const Text('भाव अलर्ट, मौसम चेतावनी, प्रकोप सूचनाएं'),
+      title: const Text('Push notifications'),
+      subtitle: const Text('Price alerts, weather warnings and outbreak notifications'),
       value: profile.notificationsEnabled,
       onChanged: (v) => profile.toggleNotifications(v),
       activeColor: AppTheme.primaryGreen,
     );
   }
 
-  Widget _buildAlertPreferencesTile() {
+  Widget _buildAlertPreferencesTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.tune),
-      title: const Text('अलर्ट प्राथमिकताएं'),
-      subtitle: const Text('कौन से अलर्ट प्राप्त करें'),
+      title: const Text('Alert preferences'),
+      subtitle: const Text('Choose which alerts to receive'),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _showAlertPreferencesDialog(context),
     );
@@ -142,38 +142,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('अलर्ट प्राथमिकताएं'),
+        title: const Text('Alert preferences'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SwitchListTile(title: const Text('भाव अलर्ट'), value: true, onChanged: (_) {}),
-            SwitchListTile(title: const Text('मौसम चेतावनी'), value: true, onChanged: (_) {}),
-            SwitchListTile(title: const Text('कीट/रोग प्रकोप'), value: true, onChanged: (_) {}),
-            SwitchListTile(title: const Text('नीति घोषणाएं'), value: false, onChanged: (_) {}),
-            SwitchListTile(title: const Text('साप्ताहिक सारांश'), value: true, onChanged: (_) {}),
+            SwitchListTile(title: const Text('Price alerts'), value: true, onChanged: (_) {}),
+            SwitchListTile(title: const Text('Weather warnings'), value: true, onChanged: (_) {}),
+            SwitchListTile(title: const Text('Pest / disease outbreaks'), value: true, onChanged: (_) {}),
+            SwitchListTile(title: const Text('Policy announcements'), value: false, onChanged: (_) {}),
+            SwitchListTile(title: const Text('Weekly summary'), value: true, onChanged: (_) {}),
           ],
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('सहेजें'))],
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Save'))],
       ),
     );
   }
 
-  Widget _buildThemeTile(ProfileProvider profile) {
+  Widget _buildThemeTile(BuildContext context, ProfileProvider profile) {
     return SwitchListTile(
       secondary: const Icon(Icons.dark_mode),
-      title: const Text('डार्क मोड'),
-      subtitle: const Text('रात में आंखों के लिए आरामदायक'),
+      title: const Text('Dark mode'),
+      subtitle: const Text('Easier on the eyes at night'),
       value: profile.darkMode,
       onChanged: (v) => profile.toggleDarkMode(v),
       activeColor: AppTheme.primaryGreen,
     );
   }
 
-  Widget _buildDataUsageTile() {
+  Widget _buildDataUsageTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.storage),
-      title: const Text('डेटा उपयोग'),
-      subtitle: const Text('कैश: 12.4 MB • ऑफलाइन डेटा: 4.2 MB'),
+      title: const Text('Data usage'),
+      subtitle: const Text('Cache: 12.4 MB • Offline data: 4.2 MB'),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _showDataUsageDialog(context),
     );
@@ -183,58 +183,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('डेटा उपयोग विवरण'),
+        title: const Text('Data usage details'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(leading: const Icon(Icons.cached), title: const Text('API कैश'), trailing: const Text('12.4 MB')),
-            ListTile(leading: const Icon(Icons.download_for_offline), title: const Text('ऑफलाइन सलाह'), trailing: const Text('4.2 MB')),
-            ListTile(leading: const Icon(Icons.image), title: const Text('सैटेलाइट इमेज'), trailing: const Text('8.7 MB')),
+            ListTile(leading: const Icon(Icons.cached), title: const Text('API Cache'), trailing: const Text('12.4 MB')),
+            ListTile(leading: const Icon(Icons.download_for_offline), title: const Text('Offline advisory'), trailing: const Text('4.2 MB')),
+            ListTile(leading: const Icon(Icons.image), title: const Text('Satellite images'), trailing: const Text('8.7 MB')),
             const Divider(),
-            ListTile(leading: const Icon(Icons.pie_chart), title: const Text('कुल'), trailing: const Text('25.3 MB', style: TextStyle(fontWeight: FontWeight.bold))),
+            ListTile(leading: const Icon(Icons.pie_chart), title: const Text('Total'), trailing: const Text('25.3 MB', style: TextStyle(fontWeight: FontWeight.bold))),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('बंद करें')),
-          ElevatedButton(onPressed: () { Navigator.pop(context); _clearCache(context); }, child: const Text('कैश साफ करें')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          ElevatedButton(onPressed: () { Navigator.pop(context); _clearCache(context); }, child: const Text('Clear cache')),
         ],
       ),
     );
   }
 
   void _clearCache(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('कैश साफ किया जा रहा है...')));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Clearing cache...')));
   }
 
-  Widget _buildCacheTile() {
+  Widget _buildCacheTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.cleaning_services),
-      title: const Text('कैश साफ करें'),
-      subtitle: const Text('अस्थाई फाइलें हटाकर स्टोरेज खाली करें'),
+      title: const Text('Clear cache'),
+      subtitle: const Text('Remove temporary files to free up storage'),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _clearCache(context),
     );
   }
 
-  Widget _buildExportTile() {
+  Widget _buildExportTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.download),
-      title: const Text('डेटा निर्यात करें'),
-      subtitle: const Text('अपनी प्रोफाइल, फसलें, और इतिहास डाउनलोड करें'),
+      title: const Text('Export data'),
+      subtitle: const Text('Download your profile, crops and history'),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _exportData(context),
     );
   }
 
   void _exportData(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('निर्यात तैयार हो रहा है...')));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Preparing export...')));
   }
 
-  Widget _buildDeleteTile() {
+  Widget _buildDeleteTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.delete_forever, color: Colors.red),
-      title: const Text('खाता हटाएं', style: TextStyle(color: Colors.red)),
-      subtitle: const Text('स्थायी रूप से सभी डेटा मिटाएं'),
+      title: const Text('Delete account', style: TextStyle(color: Colors.red)),
+      subtitle: const Text('Permanently delete all data'),
       onTap: () => _showDeleteConfirmation(context),
     );
   }
@@ -243,34 +243,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('खाता हटाएं?'),
-        content: const Text('यह कार्रवाई पूर्ववत नहीं की जा सकती। सभी डेटा स्थायी रूप से मिट जाएगा।'),
+        title: const Text('Delete account?'),
+        content: const Text('This action cannot be undone. All data will be permanently deleted.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('रद्द')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () { Navigator.pop(context); Navigator.of(context).pushNamed('/login'); },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('हटाएं'),
+            child: const Text('Delete'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildVersionTile() {
+  Widget _buildVersionTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.info_outline),
-      title: const Text('ऐप संस्करण'),
+      title: const Text('App version'),
       subtitle: const Text('1.0.0+1 (Build 1)'),
-      trailing: const Text('नवीनतम'),
+      trailing: const Text('Latest'),
     );
   }
 
-  Widget _buildLicenseTile() {
+  Widget _buildLicenseTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.description),
-      title: const Text('ओपन सोर्स लाइसेंस'),
-      subtitle: const Text('थर्ड-पार्टी लाइसेंस देखें'),
+      title: const Text('Open source licenses'),
+      subtitle: const Text('View third-party licenses'),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _showLicensesDialog(context),
     );
@@ -280,11 +280,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showLicensePage(context: context, applicationName: 'Kisaan-ML', applicationVersion: '1.0.0+1');
   }
 
-  Widget _buildSupportTile() {
+  Widget _buildSupportTile(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.help_outline),
-      title: const Text('सहायता और प्रतिक्रिया'),
-      subtitle: const Text('समस्या रिपोर्ट करें या सुझाव दें'),
+      title: const Text('Help and feedback'),
+      subtitle: const Text('Report a problem or share a suggestion'),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _showSupportDialog(context),
     );
@@ -294,19 +294,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('सहायता'),
+        title: const Text('Help'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('ईमेल: support@kisaan-ml.in'),
+            const Text('Email: support@kisaan-ml.in'),
             const SizedBox(height: 8),
             const Text('WhatsApp: +91-98765-43210'),
             const SizedBox(height: 8),
             const Text('GitHub: github.com/kisaan-ml/issues'),
           ],
         ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('बंद करें'))],
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
       ),
     );
   }
@@ -316,7 +316,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       width: double.infinity,
       child: OutlinedButton.icon(
         icon: const Icon(Icons.logout),
-        label: const Text('लॉगआउट'),
+        label: const Text('Log out'),
         onPressed: () => context.go('/login'),
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.red,
@@ -327,3 +327,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
+

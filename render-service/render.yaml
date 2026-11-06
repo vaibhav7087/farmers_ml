@@ -2,50 +2,37 @@ services:
   - type: web
     name: kisaan-ml-render
     runtime: node
-    plan: starter
+    plan: free
     region: singapore
-    buildCommand: npm ci && npm run build
+    rootDir: render-service
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 8080
+      - key: NODE_VERSION
+        value: 22.22.0
       - key: REDIS_URL
-        fromDatabase:
+        fromService:
+          type: keyvalue
           name: kisaan-ml-redis
           property: connectionString
-      - key: DATABASE_URL
-        fromDatabase:
-          name: kisaan-ml-postgres
-          property: connectionString
-      - key: CF_R2_ACCOUNT_ID
-        sync: false
-      - key: CF_R2_ACCESS_KEY_ID
-        sync: false
-      - key: CF_R2_SECRET_ACCESS_KEY
-        sync: false
-      - key: CF_R2_BUCKET
-        value: kisaan-ml-models
-      - key: CF_WORKERS_API_URL
-        value: https://kisaan-ml-api.your-subdomain.workers.dev
-      - key: PIB_RSS_URL
-        value: https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&RegId=3
-      - key: PLANETARY_COMPUTER_API
-        value: https://api.planetarycomputer.microsoft.com/api/stac/v1
-      - key: LOG_LEVEL
-        value: info
-    healthCheckPath: /health
-    autoDeploy: true
-
-databases:
-  - name: kisaan-ml-postgres
-    plan: starter
+  - type: keyvalue
+    name: kisaan-ml-redis
+    plan: free
     region: singapore
-    databaseName: kisaan_ml
-    user: kisaan
+    maxmemoryPolicy: noeviction
+    ipAllowList: []
 
-  - name: kisaan-ml-redis
-    plan: starter
-    region: singapore
-    maxmemoryPolicy: allkeys-lru
+
+  - type: web
+    name: kisaan-ml-app
+    runtime: static
+    rootDir: app
+    buildCommand: bash build-render.sh
+    staticPublishPath: build/web
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
